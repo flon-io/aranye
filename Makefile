@@ -1,5 +1,5 @@
 
-NAME=marquebas
+NAME=aranye
 
 default: $(NAME).o
 
