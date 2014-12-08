@@ -38,13 +38,13 @@ static int validate(fara_node *n)
   return 1; // TODO
 }
 
-fara_node *fara_node_malloc(const char *tag, flu_dict *atts)
+fara_node *fara_node_malloc(const char *t, flu_dict *atts)
 {
   fara_node *r = calloc(1, sizeof(fara_node));
 
-  r->tag = strdup(tag);
-  r->atts = atts ? atts : flu_list_malloc();
-  r->children = flu_list_malloc();
+  r->t = strdup(t);
+  r->atts = atts;
+  r->children = atts ? flu_list_malloc() : NULL;
 
   if ( ! validate(r)) { fara_node_free(r); return NULL; }
 
@@ -53,11 +53,11 @@ fara_node *fara_node_malloc(const char *tag, flu_dict *atts)
 
 fara_node *fara_n(const char *tag, ...)
 {
-  va_list ap; va_start(ap, tag);
-
   fara_node *r = calloc(1, sizeof(fara_node));
 
-  r->tag = flu_svprintf(tag, ap);
+  va_list ap; va_start(ap, tag);
+
+  r->t = flu_svprintf(tag, ap);
   r->atts = flu_vsd(ap);
   r->children = flu_list_malloc();
 
@@ -68,15 +68,28 @@ fara_node *fara_n(const char *tag, ...)
   return r;
 }
 
+fara_node *fara_t(const char *text, ...)
+{
+  va_list ap; va_start(ap, text);
+  char *t = flu_svprintf(text, ap);
+  va_end(ap);
+
+  fara_node *r = fara_node_malloc(t, NULL);
+
+  free(t);
+
+  return r;
+}
+
 void fara_node_free(fara_node *n)
 {
   if (n == NULL) return;
 
   n->parent = NULL;
-  free(n->tag);
+  free(n->t);
   flu_list_free_all(n->atts);
 
-  for (flu_node *fn = n->children->first; fn; fn = fn->next)
+  if (n->children) for (flu_node *fn = n->children->first; fn; fn = fn->next)
   {
     fara_node_free(fn->item);
   }
@@ -93,7 +106,7 @@ void fara_node_push(fara_node *parent, fara_node *child)
 
 static void to_html(fara_node *n, int flags, flu_sbuffer *b)
 {
-  flu_sbprintf(b, "<%s", n->tag);
+  flu_sbprintf(b, "<%s", n->t);
   //
   for (flu_node *fn = n->atts->first; fn; fn = fn->next)
   {
@@ -107,7 +120,7 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b)
     to_html(fn->item, flags, b);
   }
 
-  flu_sbprintf(b, "</%s>", n->tag);
+  flu_sbprintf(b, "</%s>", n->t);
 }
 
 char *fara_node_to_html(fara_node *n, int flags)

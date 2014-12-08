@@ -33,13 +33,14 @@
 
 typedef struct {
   struct fara_node *parent;
-  char *tag;
+  char *t;
   flu_dict *atts;
   flu_list *children;
 } fara_node;
 
 fara_node *fara_node_malloc(const char *tag, flu_dict *atts);
 fara_node *fara_n(const char *tag, ...);
+fara_node *fara_t(const char *text, ...);
 
 void fara_node_free(fara_node *n);
 
