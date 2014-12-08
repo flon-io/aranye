@@ -57,5 +57,7 @@ char *fara_node_to_html(fara_node *n, int flags);
 
 #define fara_h(node) fara_node_to_html(node, 1)
 
+void fara_node_add_class(fara_node *n, const char *cla);
+
 #endif // FLON_FARA_DOM_H
 

@@ -131,5 +131,35 @@ context "dom:"
         "</div>");
     }
   }
+
+  describe "fara_node_add_class()"
+  {
+    it "adds a class when there were no classes"
+    {
+      n = fara_n("div", NULL);
+
+      fara_node_add_class(n, "x");
+
+      expect(fara_node_to_html(n, 0) ===f "<div class=\"x\"></div>");
+    }
+
+    it "adds a class when the class attribute was empty"
+    {
+      n = fara_n("div", "class", "", NULL);
+
+      fara_node_add_class(n, "y");
+
+      expect(fara_node_to_html(n, 0) ===f "<div class=\"y\"></div>");
+    }
+
+    it "adds a class when the class attribute already held a value"
+    {
+      n = fara_n("div", "class", "a", NULL);
+
+      fara_node_add_class(n, "z");
+
+      expect(fara_node_to_html(n, 0) ===f "<div class=\"a z\"></div>");
+    }
+  }
 }
 

@@ -110,10 +110,12 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
   {
     flu_sbprintf(b, "%*s<%s", i * 2, "", n->t);
     //
-    for (flu_node *fn = n->atts->first; fn; fn = fn->next)
+    flu_dict *atts = flu_list_dtrim(n->atts);
+    for (flu_node *fn = atts->first; fn; fn = fn->next)
     {
       flu_sbprintf(b, " %s=\"%s\"", fn->key, (char *)fn->item);
     }
+    flu_list_free(atts);
     //
     flu_sbputc(b, '>');
     if (fi) flu_sbputc(b, '\n');
@@ -138,5 +140,16 @@ char *fara_node_to_html(fara_node *n, int flags)
   to_html(n, flags, b, 0);
 
   return flu_sbuffer_to_string(b);
+}
+
+void fara_node_add_class(fara_node *n, const char *cla)
+{
+  char *c = flu_list_get(n->atts, "class");
+
+  char *c1 = NULL;
+  if (c && strlen(c) > 0) c1 = flu_sprintf("%s %s", c, cla);
+  else c1 = strdup(cla);
+
+  flu_list_set(n->atts, "class", c1);
 }
 
