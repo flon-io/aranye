@@ -27,7 +27,7 @@ context "dom:"
 
       expect(n != NULL);
       expect(n->parent == NULL);
-      expect(n->t != "div");
+      //expect(n->t != "div");
       expect(n->t === "div");
       expect(n->atts->size zu== 0);
       expect(n->children->size zu== 0);
@@ -42,7 +42,7 @@ context "dom:"
 
       expect(n != NULL);
       expect(n->parent == NULL);
-      expect(n->t != "div");
+      //expect(n->t != "div");
       expect(n->t === "div");
       expect(n->atts->size zu== 0);
       expect(n->children->size zu== 0);
@@ -95,6 +95,21 @@ context "dom:"
 
       expect(fara_node_to_html(n, 0) ===f ""
         "<div class=\"a\"><div class=\"b\"></div></div>");
+    }
+
+    context "when FARA_F_INDENT"
+    {
+      it "renders as indented html"
+      {
+        n = fara_n("div", "class", "a", NULL);
+        fara_node_push(n, fara_n("div", "class", "b", NULL));
+
+        expect(fara_node_to_html(n, FARA_F_INDENT) ===f ""
+          "<div class=\"a\">\n"
+          "  <div class=\"b\">\n"
+          "  </div>\n"
+          "</div>");
+      }
     }
   }
 }

@@ -31,7 +31,7 @@
 #include "flutil.h"
 
 
-typedef struct {
+typedef struct fara_node {
   struct fara_node *parent;
   char *t;
   flu_dict *atts;
@@ -48,7 +48,7 @@ void fara_node_push(fara_node *parent, fara_node *child);
 
 enum // flags for fara_node_to_html()
 {
-  FABR_F_INDENT  = 1 << 0  // indent
+  FARA_F_INDENT  = 1 << 0  // indent
 };
 
 char *fara_node_to_html(fara_node *n, int flags);
