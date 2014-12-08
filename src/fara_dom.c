@@ -42,9 +42,9 @@ fara_node *fara_node_malloc(const char *t, flu_dict *atts)
 {
   fara_node *r = calloc(1, sizeof(fara_node));
 
-  r->t = strdup(t);
+  r->t = t ? strdup(t) : NULL;
   r->atts = atts;
-  r->children = atts ? flu_list_malloc() : NULL;
+  r->children = (atts || t == NULL) ? flu_list_malloc() : NULL;
 
   if ( ! validate(r)) { fara_node_free(r); return NULL; }
 
@@ -109,23 +109,29 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
   int fi = flags & FARA_F_INDENT;
   int i = fi ? indent : 0;
 
-  flu_sbprintf(b, "%*s<%s", i * 2, "", n->t);
-  //
-  for (flu_node *fn = n->atts->first; fn; fn = fn->next)
+  if (n->t)
   {
-    flu_sbprintf(b, " %s=\"%s\"", fn->key, (char *)fn->item);
+    flu_sbprintf(b, "%*s<%s", i * 2, "", n->t);
+    //
+    for (flu_node *fn = n->atts->first; fn; fn = fn->next)
+    {
+      flu_sbprintf(b, " %s=\"%s\"", fn->key, (char *)fn->item);
+    }
+    //
+    flu_sbputc(b, '>');
+    if (fi) flu_sbputc(b, '\n');
   }
-  //
-  flu_sbputc(b, '>');
-  if (fi) flu_sbputc(b, '\n');
 
   for (flu_node *fn = n->children->first; fn; fn = fn->next)
   {
-    to_html(fn->item, flags, b, indent + 1);
+    to_html(fn->item, flags, b, indent + n->t ? 1 : 0);
   }
 
-  flu_sbprintf(b, "%*s</%s>", i * 2, "", n->t);
-  if (fi && n->parent) flu_sbputc(b, '\n');
+  if (n->t)
+  {
+    flu_sbprintf(b, "%*s</%s>", i * 2, "", n->t);
+    if (fi && n->parent) flu_sbputc(b, '\n');
+  }
 }
 
 char *fara_node_to_html(fara_node *n, int flags)

@@ -126,6 +126,8 @@ fara_node *fara_haml_parse(const char *s)
   fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
   flu_putf(fabr_tree_to_string(t, s, 1));
 
-  return NULL;
+  fara_node *r = fara_node_malloc(NULL, NULL); // document node
+
+  return r;
 }
 

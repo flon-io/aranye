@@ -17,6 +17,10 @@ context "haml:"
     {
       fara_node *n = fara_haml_parse(
         "%h1");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<h1>\n"
+        "</h1>");
     }
 
     it "parses a haml string into a fara node"
@@ -24,9 +28,9 @@ context "haml:"
       fara_node *n = fara_haml_parse(
         "#id.class{ x: y }");
 
-      //expect(fara_node_to_html(n, 1) ===f ""
-      //  "<div id=\"id\" class=\"class\" x=\"y\">\n"
-      //  "</div>");
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div id=\"id\" class=\"class\" x=\"y\">\n"
+        "</div>");
     }
   }
 }

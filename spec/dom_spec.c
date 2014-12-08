@@ -97,6 +97,19 @@ context "dom:"
         "<div class=\"a\"><div class=\"b\"></div></div>");
     }
 
+    it "renders a 'document' node"
+    {
+      n = fara_node_malloc(NULL, NULL);
+      fara_node_push(n, fara_n("div", "class", "a", NULL));
+      fara_node_push(n, fara_n("div", "class", "b", NULL));
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"a\">\n"
+        "</div>\n"
+        "<div class=\"b\">\n"
+        "</div>\n");
+    }
+
     context "when FARA_F_INDENT"
     {
       it "renders as indented html"
