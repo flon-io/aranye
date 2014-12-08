@@ -96,6 +96,14 @@ void fara_node_push(fara_node *parent, fara_node *child)
 static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
 {
   int fi = flags & FARA_F_INDENT;
+
+  if (n->atts == NULL && n->children == NULL)
+  {
+    flu_sbputs(b, n->t);
+    if (fi) flu_sbputc(b, '\n');
+    return;
+  }
+
   int i = fi ? indent : 0;
 
   if (n->t)

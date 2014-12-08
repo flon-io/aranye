@@ -108,19 +108,27 @@ context "dom:"
         "</div>\n");
     }
 
-    context "when FARA_F_INDENT"
+    it "renders as indented html when FARA_F_INDENT"
     {
-      it "renders as indented html"
-      {
-        n = fara_n("div", "class", "a", NULL);
-        fara_node_push(n, fara_n("div", "class", "b", NULL));
+      n = fara_n("div", "class", "a", NULL);
+      fara_node_push(n, fara_n("div", "class", "b", NULL));
 
-        expect(fara_node_to_html(n, FARA_F_INDENT) ===f ""
-          "<div class=\"a\">\n"
-          "  <div class=\"b\">\n"
-          "  </div>\n"
-          "</div>");
-      }
+      expect(fara_node_to_html(n, FARA_F_INDENT) ===f ""
+        "<div class=\"a\">\n"
+        "  <div class=\"b\">\n"
+        "  </div>\n"
+        "</div>");
+    }
+
+    it "renders text nodes"
+    {
+      n = fara_n("div", "class", "a", NULL);
+      fara_node_push(n, fara_t("hello haml"));
+
+      expect(fara_node_to_html(n, FARA_F_INDENT) ===f ""
+        "<div class=\"a\">\n"
+        "hello haml\n"
+        "</div>");
     }
   }
 }
