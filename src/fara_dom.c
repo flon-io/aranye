@@ -27,7 +27,59 @@
 
 #define _POSIX_C_SOURCE 200809L
 
-//#include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "fara_dom.h"
+
+
+fara_node *fara_node_malloc(const char *tag, flu_dict *atts)
+{
+  fara_node *r = calloc(1, sizeof(fara_node));
+
+  r->tag = strdup(tag);
+  r->atts = atts ? atts : flu_list_malloc();
+  r->children = flu_list_malloc();
+
+  return r;
+}
+
+fara_node *fara_n(const char *tag, ...)
+{
+  va_list ap; va_start(ap, tag);
+
+  fara_node *r = calloc(1, sizeof(fara_node));
+
+  r->tag = flu_svprintf(tag, ap);
+  r->atts = flu_vsd(ap);
+  r->children = flu_list_malloc();
+
+  va_end(ap);
+
+  return r;
+}
+
+void fara_node_free(fara_node *n)
+{
+  if (n == NULL) return;
+
+  n->parent = NULL;
+  free(n->tag);
+  flu_list_free_all(n->atts);
+
+  if (n->children) for (flu_node *fn = n->children->first; fn; )
+  {
+    flu_node *next = fn->next;
+    fara_node_free((fara_node *)fn->item);
+    fn = next;
+  }
+  flu_list_free(n->children);
+
+  free(n);
+}
+
+char *fara_node_to_html(fara_node *n)
+{
+  return NULL;
+}
 
