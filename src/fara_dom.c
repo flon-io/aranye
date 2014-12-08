@@ -104,9 +104,12 @@ void fara_node_push(fara_node *parent, fara_node *child)
   flu_list_add(parent->children, child);
 }
 
-static void to_html(fara_node *n, int flags, flu_sbuffer *b)
+static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
 {
-  flu_sbprintf(b, "<%s", n->t);
+  int fi = flags & FARA_F_INDENT;
+  int i = fi ? indent : 0;
+
+  flu_sbprintf(b, "%*s<%s", i * 2, "", n->t);
   //
   for (flu_node *fn = n->atts->first; fn; fn = fn->next)
   {
@@ -114,20 +117,22 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b)
   }
   //
   flu_sbputc(b, '>');
+  if (fi) flu_sbputc(b, '\n');
 
   for (flu_node *fn = n->children->first; fn; fn = fn->next)
   {
-    to_html(fn->item, flags, b);
+    to_html(fn->item, flags, b, indent + 1);
   }
 
-  flu_sbprintf(b, "</%s>", n->t);
+  flu_sbprintf(b, "%*s</%s>", i * 2, "", n->t);
+  if (fi && n->parent) flu_sbputc(b, '\n');
 }
 
 char *fara_node_to_html(fara_node *n, int flags)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  to_html(n, flags, b);
+  to_html(n, flags, b, 0);
 
   return flu_sbuffer_to_string(b);
 }
