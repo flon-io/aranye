@@ -49,15 +49,32 @@ context "dom:"
     }
   }
 
+  describe "fara_node_push()"
+  {
+    it "adds a child to a node"
+    {
+      n = fara_n("div", "class", "a", NULL);
+      fara_node *n1 = fara_n("div", "class", "b", NULL);
+
+      fara_node_push(n, n1);
+
+      expect(n->children->first != NULL);
+      expect(n->children->first->item == n1);
+      expect(n1->parent == n);
+    }
+  }
+
   describe "fara_node_to_html()"
   {
-    it "turns a dom node into html"
+    it "renders a dom node as html"
     {
       n = fara_n("div", "class", "menu-%s", "bretzel", NULL);
 
       expect(fara_node_to_html(n, 0) ===f ""
         "<div class=\"menu-bretzel\"></div>");
     }
+
+    it "renders a node and its children as html"
   }
 }
 

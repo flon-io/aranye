@@ -76,15 +76,19 @@ void fara_node_free(fara_node *n)
   free(n->tag);
   flu_list_free_all(n->atts);
 
-  if (n->children) for (flu_node *fn = n->children->first; fn; )
+  for (flu_node *fn = n->children->first; fn; fn = fn->next)
   {
-    flu_node *next = fn->next;
-    fara_node_free((fara_node *)fn->item);
-    fn = next;
+    fara_node_free(fn->item);
   }
   flu_list_free(n->children);
 
   free(n);
+}
+
+void fara_node_push(fara_node *parent, fara_node *child)
+{
+  child->parent = parent;
+  flu_list_add(parent->children, child);
 }
 
 static void to_html(fara_node *n, int flags, flu_sbuffer *b)

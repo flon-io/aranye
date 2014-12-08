@@ -43,6 +43,8 @@ fara_node *fara_n(const char *tag, ...);
 
 void fara_node_free(fara_node *n);
 
+void fara_node_push(fara_node *parent, fara_node *child);
+
 enum // flags for fara_node_to_html()
 {
   FABR_F_INDENT  = 1 << 0  // indent
