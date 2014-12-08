@@ -1,14 +1,14 @@
 
 //
-// specifying aabro
+// specifying aranye
 //
 // Sun Nov  9 19:38:23 JST 2014
 //
 
-#include "marquebas.h"
+#include "fara_dom.h"
 
 
-context "marquebas"
+context "dom:"
 {
   describe "x()"
   {
