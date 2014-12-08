@@ -37,27 +37,69 @@ fabr_parser *haml_parser = NULL;
 
 void haml_parser_init()
 {
-  fabr_parser *attributes =
-    fabr_string("{atts}");
-
-  fabr_parser *tag_id_or_class =
-    fabr_n_rex("tic", "[%#\.][a-zA-Z-_0-9]+");
-
-  fabr_parser *blank_line =
-    fabr_n_rex("bl", "[ \t]*");
-
-  fabr_parser *haml_line =
+  fabr_parser *jsentry =
     fabr_n_seq(
-      "hl",
-      tag_id_or_class, fabr_q("+"),
-      attributes, fabr_q("?"),
+      "jsentry",
+      fabr_n_rex("k", "[^ \t\r\n:]+"),
+      fabr_rex("[ \t]*:[ \t]*"),
+      fabr_n_rex("v", "[^ \t\r\n,]+"),
+      NULL);
+  fabr_parser *jsatts =
+    fabr_n_seq(
+      "jsatts",
+      fabr_rex("[ \t]*\\{[ \t]*"),
+      fabr_seq(
+        jsentry, fabr_seq(fabr_rex("[ \t]*,[ \t]*"), jsentry, fabr_r("*")), NULL
+      ), fabr_q("?"),
+      fabr_rex("[ \t]*}[ \t]*"),
       NULL);
 
+  fabr_parser *htatts =
+    fabr_string("( x=\"y\" )");
+
+  fabr_parser *tag_id_or_class =
+    fabr_n_rex("tic", "[%#\\.][a-zA-Z-_0-9]+");
+
+  fabr_parser *ind =
+    fabr_n_rex("ind", "[ ]*");
+
+  fabr_parser *eval_eol =
+    fabr_n_seq("eveol", fabr_str("="), fabr_rex("[^\r\n]*"), NULL);
+
+  fabr_parser *blank_line =
+    fabr_n_rex("bll", "[ \t]*");
+
   fabr_parser *text_line =
-    fabr_n_rex("tl", "[^\r\n]+");
+    fabr_n_rex("txl", "[^\r\n]+");
+
+  fabr_parser *haml_comment_line =
+    fabr_n_seq("hacol", fabr_string("-#"), fabr_rex("[^\r\n]*"), NULL);
+
+  fabr_parser *html_comment_line =
+    fabr_n_seq("htcol", fabr_string("/"), fabr_rex("[^\r\n]*"), NULL);
+
+  fabr_parser *filter_line =
+    fabr_n_seq( "fil", ind, fabr_rex(":[a-z]+"), NULL);
+
+  fabr_parser *eval_line =
+    fabr_n_seq("evl", ind, eval_eol, NULL);
+
+  fabr_parser *elt_line =
+    fabr_n_seq(
+      "ell",
+      ind,
+      tag_id_or_class, fabr_q("+"),
+      jsatts, fabr_q("?"),
+      htatts, fabr_q("?"),
+      eval_eol, fabr_q("?"),
+      NULL);
 
   fabr_parser *line =
-    fabr_alt(haml_line, text_line, blank_line, NULL);
+    fabr_alt(
+      elt_line, eval_line, filter_line, html_comment_line, haml_comment_line,
+      text_line,
+      blank_line,
+      NULL);
 
   haml_parser =
     fabr_seq(
@@ -75,10 +117,13 @@ fara_node *fara_haml_parse(const char *s)
 
   //puts("[1;30m"); puts(fabr_parser_to_string(haml_parser)); puts("[0;0m");
   //fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
-  fabr_tree *t = fabr_parse_f(s, 0, haml_parser, 0);
-  // TODO: deal with errors (t->result < 0)
 
   printf(">[0;33m%s[0;0m<\n", s);
+  fabr_tree *tt = fabr_parse_f(s, 0, haml_parser, 0);
+  //flu_putf(fabr_tree_to_string(tt, s, 1));
+  //fabr_tree_free(tt);
+
+  fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
   flu_putf(fabr_tree_to_string(t, s, 1));
 
   return NULL;
