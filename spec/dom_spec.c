@@ -75,6 +75,13 @@ context "dom:"
     }
 
     it "renders a node and its children as html"
+    {
+      n = fara_n("div", "class", "a", NULL);
+      fara_node_push(n, fara_n("div", "class", "b", NULL));
+
+      expect(fara_node_to_html(n, 0) ===f ""
+        "<div class=\"a\"><div class=\"b\"></div></div>");
+    }
   }
 }
 

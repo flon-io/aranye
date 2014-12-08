@@ -94,13 +94,18 @@ void fara_node_push(fara_node *parent, fara_node *child)
 static void to_html(fara_node *n, int flags, flu_sbuffer *b)
 {
   flu_sbprintf(b, "<%s", n->tag);
+  //
   for (flu_node *fn = n->atts->first; fn; fn = fn->next)
   {
     flu_sbprintf(b, " %s=\"%s\"", fn->key, (char *)fn->item);
   }
+  //
   flu_sbputc(b, '>');
 
-  // TODO: children
+  for (flu_node *fn = n->children->first; fn; fn = fn->next)
+  {
+    to_html(fn->item, flags, b);
+  }
 
   flu_sbprintf(b, "</%s>", n->tag);
 }
