@@ -53,7 +53,10 @@ context "dom:"
   {
     it "turns a dom node into html"
     {
-      expect(0 == 1);
+      n = fara_n("div", "class", "menu-%s", "bretzel", NULL);
+
+      expect(fara_node_to_html(n, 0) ===f ""
+        "<div class=\"menu-bretzel\"></div>");
     }
   }
 }

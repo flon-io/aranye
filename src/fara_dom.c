@@ -33,6 +33,11 @@
 #include "fara_dom.h"
 
 
+static int validate(fara_node *n)
+{
+  return 1; // TODO
+}
+
 fara_node *fara_node_malloc(const char *tag, flu_dict *atts)
 {
   fara_node *r = calloc(1, sizeof(fara_node));
@@ -40,6 +45,8 @@ fara_node *fara_node_malloc(const char *tag, flu_dict *atts)
   r->tag = strdup(tag);
   r->atts = atts ? atts : flu_list_malloc();
   r->children = flu_list_malloc();
+
+  if ( ! validate(r)) { fara_node_free(r); return NULL; }
 
   return r;
 }
@@ -55,6 +62,8 @@ fara_node *fara_n(const char *tag, ...)
   r->children = flu_list_malloc();
 
   va_end(ap);
+
+  if ( ! validate(r)) { fara_node_free(r); return NULL; }
 
   return r;
 }
@@ -78,8 +87,26 @@ void fara_node_free(fara_node *n)
   free(n);
 }
 
-char *fara_node_to_html(fara_node *n)
+static void to_html(fara_node *n, int flags, flu_sbuffer *b)
 {
-  return NULL;
+  flu_sbprintf(b, "<%s", n->tag);
+  for (flu_node *fn = n->atts->first; fn; fn = fn->next)
+  {
+    flu_sbprintf(b, " %s=\"%s\"", fn->key, (char *)fn->item);
+  }
+  flu_sbputc(b, '>');
+
+  // TODO: children
+
+  flu_sbprintf(b, "</%s>", n->tag);
+}
+
+char *fara_node_to_html(fara_node *n, int flags)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  to_html(n, flags, b);
+
+  return flu_sbuffer_to_string(b);
 }
 

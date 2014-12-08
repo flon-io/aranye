@@ -43,7 +43,14 @@ fara_node *fara_n(const char *tag, ...);
 
 void fara_node_free(fara_node *n);
 
-char *fara_node_to_html(fara_node *n);
+enum // flags for fara_node_to_html()
+{
+  FABR_F_INDENT  = 1 << 0  // indent
+};
+
+char *fara_node_to_html(fara_node *n, int flags);
+
+#define fara_h(node) fara_node_to_html(node, 1)
 
 #endif // FLON_FARA_DOM_H
 
