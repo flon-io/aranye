@@ -1,7 +1,7 @@
 
 # aranye
 
-Tools for the web.
+Tools for generating HTML pages.
 
 ## License
 
