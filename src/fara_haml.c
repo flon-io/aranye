@@ -27,7 +27,7 @@
 
 #define _POSIX_C_SOURCE 200809L
 
-//#include <stdlib.h>
+#include <string.h>
 
 #include "aabro.h"
 #include "fara_haml.h"
@@ -82,7 +82,7 @@ void haml_parser_init()
     fabr_n_seq( "fil", ind, fabr_rex(":[a-z]+"), NULL);
 
   fabr_parser *eval_line =
-    fabr_n_seq("evl", ind, eval_eol, NULL);
+    fabr_n_seq("evl", fabr_string("="), fabr_rex("[^\r\n]*"), NULL);
 
   fabr_parser *elt_line =
     fabr_n_seq(
@@ -95,7 +95,8 @@ void haml_parser_init()
       NULL);
 
   fabr_parser *line =
-    fabr_alt(
+    fabr_n_alt(
+      "l",
       elt_line, eval_line, filter_line, html_comment_line, haml_comment_line,
       text_line,
       blank_line,
@@ -111,6 +112,19 @@ void haml_parser_init()
       NULL);
 }
 
+static void stack(fara_node *n, const char *s, fabr_tree *t)
+{
+  //int ni = (int)n->data;
+
+  if (strcmp(t->name, "ell") == 0)
+  {
+  }
+  else if (strcmp(t->name, "txl") == 0)
+  {
+    fara_node_push(n, fara_node_malloc(fabr_tree_string(s, t), NULL));
+  }
+}
+
 fara_node *fara_haml_parse(const char *s)
 {
   if (haml_parser == NULL) haml_parser_init();
@@ -119,14 +133,26 @@ fara_node *fara_haml_parse(const char *s)
   //fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
 
   printf(">[0;33m%s[0;0m<\n", s);
-  fabr_tree *tt = fabr_parse_f(s, 0, haml_parser, 0);
+
+  //fabr_tree *tt = fabr_parse_f(s, 0, haml_parser, 0);
   //flu_putf(fabr_tree_to_string(tt, s, 1));
   //fabr_tree_free(tt);
 
   fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
-  flu_putf(fabr_tree_to_string(t, s, 1));
+  //flu_putf(fabr_tree_to_string(t, s, 1));
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
+
+  flu_list *ls = fabr_tree_list_named(t, "l");
+
+  for (flu_node *n = ls->first; n; n = n->next)
+  {
+    fabr_tree *nl = ((fabr_tree *)n->item)->child;
+    puts("---"); flu_putf(fabr_tree_to_string(nl, s, 1));
+    stack(r, s, nl);
+  }
+
+  while (r->parent) r = r->parent;
 
   return r;
 }

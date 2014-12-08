@@ -36,9 +36,11 @@ typedef struct fara_node {
   char *t;
   flu_dict *atts;
   flu_list *children;
+  void *data; // used by 'extensions'
 } fara_node;
 
-fara_node *fara_node_malloc(const char *tag, flu_dict *atts);
+fara_node *fara_node_malloc(char *tag, flu_dict *atts);
+fara_node *fara_text(const char *text);
 fara_node *fara_n(const char *tag, ...);
 fara_node *fara_t(const char *text, ...);
 

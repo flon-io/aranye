@@ -13,7 +13,7 @@ context "haml:"
 {
   describe "fara_haml_parse()"
   {
-    it "parses a haml line"
+    it "parses a haml line %h1"
     {
       fara_node *n = fara_haml_parse(
         "%h1");
@@ -23,13 +23,33 @@ context "haml:"
         "</h1>");
     }
 
-    it "parses a haml string into a fara node"
+    it "parses a haml line #id.class{ x: y }"
     {
       fara_node *n = fara_haml_parse(
         "#id.class{ x: y }");
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div id=\"id\" class=\"class\" x=\"y\">\n"
+        "</div>");
+    }
+
+    it "parses a haml hierarchy"
+    {
+      fara_node *n = fara_haml_parse(
+        "#menu\n"
+        "  .about\n"
+        "    blah 0\n"
+        "  .links\n"
+        "    blah 1");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div id=\"menu\">\n"
+        "  <div class=\"about\">\n"
+        "    blah 0\n"
+        "  </div>"
+        "  <div class=\"links\">\n"
+        "    blah 1\n"
+        "  </div>"
         "</div>");
     }
   }

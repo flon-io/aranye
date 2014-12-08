@@ -38,11 +38,11 @@ static int validate(fara_node *n)
   return 1; // TODO
 }
 
-fara_node *fara_node_malloc(const char *t, flu_dict *atts)
+fara_node *fara_node_malloc(char *t, flu_dict *atts)
 {
   fara_node *r = calloc(1, sizeof(fara_node));
 
-  r->t = t ? strdup(t) : NULL;
+  r->t = t;
   r->atts = atts;
   r->children = (atts || t == NULL) ? flu_list_malloc() : NULL;
 
@@ -53,19 +53,12 @@ fara_node *fara_node_malloc(const char *t, flu_dict *atts)
 
 fara_node *fara_n(const char *tag, ...)
 {
-  fara_node *r = calloc(1, sizeof(fara_node));
-
   va_list ap; va_start(ap, tag);
-
-  r->t = flu_svprintf(tag, ap);
-  r->atts = flu_vsd(ap);
-  r->children = flu_list_malloc();
-
+  char *ta = flu_svprintf(tag, ap);
+  flu_dict *di = flu_vsd(ap);
   va_end(ap);
 
-  if ( ! validate(r)) { fara_node_free(r); return NULL; }
-
-  return r;
+  return fara_node_malloc(ta, di);
 }
 
 fara_node *fara_t(const char *text, ...)
@@ -74,11 +67,7 @@ fara_node *fara_t(const char *text, ...)
   char *t = flu_svprintf(text, ap);
   va_end(ap);
 
-  fara_node *r = fara_node_malloc(t, NULL);
-
-  free(t);
-
-  return r;
+  return fara_node_malloc(t, NULL);
 }
 
 void fara_node_free(fara_node *n)

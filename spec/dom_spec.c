@@ -23,11 +23,10 @@ context "dom:"
   {
     it "mallocs a fara node"
     {
-      n = fara_node_malloc("div", flu_list_malloc());
+      n = fara_node_malloc(rdz_strdup("div"), flu_list_malloc());
 
       expect(n != NULL);
       expect(n->parent == NULL);
-      //expect(n->t != "div");
       expect(n->t === "div");
       expect(n->atts->size zu== 0);
       expect(n->children->size zu== 0);
@@ -42,7 +41,6 @@ context "dom:"
 
       expect(n != NULL);
       expect(n->parent == NULL);
-      //expect(n->t != "div");
       expect(n->t === "div");
       expect(n->atts->size zu== 0);
       expect(n->children->size zu== 0);
