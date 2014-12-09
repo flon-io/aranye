@@ -314,6 +314,10 @@ void flu_list_isort(flu_list *l, int (*cmp)(const void *, const void *));
  */
 void flu_list_set(flu_list *l, const char *key, void *item);
 
+/* Like flu_list_set() but doesn't duplicate the string key, uses it as is.
+ */
+void flu_list_setk(flu_list *l, char *key, void *item);
+
 /* Sets an item under a given key, but at then end of the list.
  * Useful for "defaults".
  */

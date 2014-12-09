@@ -769,7 +769,13 @@ void flu_list_isort(flu_list *l, int (*cmp)(const void *, const void *))
 
 void flu_list_set(flu_list *l, const char *key, void *item)
 {
-  flu_list_unshift(l, item); l->first->key = strdup(key);
+  //flu_list_unshift(l, item); l->first->key = strdup(key);
+  flu_list_setk(l, strdup(key), item);
+}
+
+void flu_list_setk(flu_list *l, char *key, void *item)
+{
+  flu_list_unshift(l, item); l->first->key = key;
 }
 
 void flu_list_set_last(flu_list *l, const char *key, void *item)
