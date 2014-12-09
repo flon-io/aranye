@@ -28,6 +28,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "aabro.h"
 #include "fara_haml.h"
@@ -57,8 +58,13 @@ void haml_parser_init()
   fabr_parser *htatts =
     fabr_string("( x=\"y\" )");
 
-  fabr_parser *tag_id_or_class =
-    fabr_n_rex("tic", "[%#\\.][a-zA-Z-_0-9]+");
+  fabr_parser *tic =
+    fabr_n_alt(
+      "tic",
+      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z-_0-9]+"), NULL),
+      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z-_0-9]+"), NULL),
+      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z-_0-9]+"), NULL),
+      NULL);
 
   fabr_parser *ind =
     fabr_n_rex("ind", "[ ]*");
@@ -88,7 +94,7 @@ void haml_parser_init()
     fabr_n_seq(
       "ell",
       ind,
-      tag_id_or_class, fabr_q("+"),
+      tic, fabr_q("+"),
       jsatts, fabr_q("?"),
       htatts, fabr_q("?"),
       eval_eol, fabr_q("?"),
@@ -112,17 +118,82 @@ void haml_parser_init()
       NULL);
 }
 
-static void stack(fara_node *n, const char *s, fabr_tree *t)
+static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
 {
-  //int ni = (int)n->data;
+  //puts("---"); flu_putf(fabr_tree_to_string(t, s, 1));
 
+  int ci = (int)n->data;
+  int i = t->child->length; // first child is "ind"
+
+  fara_node *nn = fara_node_malloc(NULL, flu_list_malloc());
+  nn->data = (void *)i; // ;-)
+
+  // attributes
+
+  flu_list *ents = fabr_tree_list_named(t, "jsentry");
+  for (flu_node *en = ents->first; en; en = en->next)
+  {
+    flu_list_set(
+      nn->atts,
+      fabr_lookup_string(s, en->item, "k"),
+      fabr_lookup_string(s, en->item, "v"));
+  }
+  flu_list_free(ents);
+
+  // tag
+
+  char *ta = fabr_lookup_string(s, t, "ta");
+  nn->t = ta ? ta : strdup("div");
+
+  // class
+
+  flu_list *cs = fabr_tree_list_named(t, "cl");
+  for (flu_node *cn = cs->first; cn; cn = cn->next)
+  {
+    char *cl = fabr_tree_string(s, cn->item);
+    fara_node_add_class(nn, cl);
+    free(cl);
+  }
+
+  // id
+
+  char *id = fabr_lookup_string(s, t, "id");
+  if (id) flu_list_set(nn->atts, "id", id);
+
+  // push to parent
+
+  if (i > ci)
+  {
+    fara_node_push(n, nn);
+  }
+  else if (i == ci)
+  {
+    fara_node_push(n->parent, nn);
+  }
+  else
+  {
+    while (i < ci) { n = n->parent; ci = (int)n->data; }
+    fara_node_push(n, nn);
+  }
+
+  return nn;
+}
+
+static fara_node *stack_txl(fara_node *n, const char *s, fabr_tree *t)
+{
+  fara_node_push(n, fara_node_malloc(fabr_tree_string(s, t), NULL));
+
+  return n;
+}
+
+static fara_node *stack(fara_node *n, const char *s, fabr_tree *t)
+{
   if (strcmp(t->name, "ell") == 0)
-  {
-  }
-  else if (strcmp(t->name, "txl") == 0)
-  {
-    fara_node_push(n, fara_node_malloc(fabr_tree_string(s, t), NULL));
-  }
+    return stack_ell(n, s, t);
+  if (strcmp(t->name, "txl") == 0)
+    return stack_txl(n, s, t);
+  //else ?
+  return n;
 }
 
 fara_node *fara_haml_parse(const char *s)
@@ -132,7 +203,7 @@ fara_node *fara_haml_parse(const char *s)
   //puts("[1;30m"); puts(fabr_parser_to_string(haml_parser)); puts("[0;0m");
   //fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
 
-  printf(">[0;33m%s[0;0m<\n", s);
+  //printf(">[0;33m%s[0;0m<\n", s);
 
   //fabr_tree *tt = fabr_parse_f(s, 0, haml_parser, 0);
   //flu_putf(fabr_tree_to_string(tt, s, 1));
@@ -142,14 +213,15 @@ fara_node *fara_haml_parse(const char *s)
   //flu_putf(fabr_tree_to_string(t, s, 1));
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
+  r->data = (void *)-1; // ;-)
 
   flu_list *ls = fabr_tree_list_named(t, "l");
 
   for (flu_node *n = ls->first; n; n = n->next)
   {
     fabr_tree *nl = ((fabr_tree *)n->item)->child;
-    puts("---"); flu_putf(fabr_tree_to_string(nl, s, 1));
-    stack(r, s, nl);
+    //puts("---"); flu_putf(fabr_tree_to_string(nl, s, 1));
+    r = stack(r, s, nl);
   }
 
   while (r->parent) r = r->parent;

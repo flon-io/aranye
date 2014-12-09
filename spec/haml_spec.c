@@ -20,7 +20,7 @@ context "haml:"
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<h1>\n"
-        "</h1>");
+        "</h1>\n");
     }
 
     it "parses a haml line #id.class{ x: y }"
@@ -30,7 +30,7 @@ context "haml:"
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div id=\"id\" class=\"class\" x=\"y\">\n"
-        "</div>");
+        "</div>\n");
     }
 
     it "parses a haml hierarchy"
@@ -46,11 +46,11 @@ context "haml:"
         "<div id=\"menu\">\n"
         "  <div class=\"about\">\n"
         "    blah 0\n"
-        "  </div>"
+        "  </div>\n"
         "  <div class=\"links\">\n"
         "    blah 1\n"
-        "  </div>"
-        "</div>");
+        "  </div>\n"
+        "</div>\n");
     }
   }
 }
