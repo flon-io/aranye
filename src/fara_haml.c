@@ -27,8 +27,9 @@
 
 #define _POSIX_C_SOURCE 200809L
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 #include "aabro.h"
 #include "fara_haml.h"
@@ -117,17 +118,26 @@ void haml_parser_init()
       fabr_rex("[\n\r]+"),
       NULL);
 
+  fabr_parser *doctype =
+    fabr_seq(
+      fabr_rex("!!![ \t]*"),
+      fabr_n_rex("dt", "[^ \t\n\r]*"),
+      fabr_rex("[\n\r]+"),
+      NULL);
+
   fabr_parser *headers =
     fabr_n_seq(
       "hes",
       fabr_rex("---[ \t]*[\n\r]+"),
       hentry, fabr_q("*"),
-      fabr_rex("---[ \t]*"),
+      fabr_rex("---[ \t]*[\n\r]+"),
       NULL);
 
   haml_parser =
     fabr_seq(
-      fabr_alt(headers, line, NULL),
+      headers, fabr_q("?"),
+      doctype, fabr_q("?"),
+      line,
       fabr_seq(
         fabr_rex("[\n\r]"),
         line,
@@ -222,6 +232,56 @@ static fara_node *stack(fara_node *n, const char *s, fabr_tree *t)
   return n;
 }
 
+static fara_node *doctype(const char *dt)
+{
+  char *s =
+    "<!DOCTYPE html PUBLIC"
+    " \"-//W3C//DTD XHTML 1.0 Transitional//EN\""
+    " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">";
+
+  if (strcasecmp(dt, "strict") == 0)
+    s =
+      "<!DOCTYPE html PUBLIC"
+      " \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+      " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">";
+
+  else if (strcasecmp(dt, "frameset") == 0)
+    s =
+      "<!DOCTYPE html PUBLIC"
+      " \"-//W3C//DTD XHTML 1.0 Frameset//EN\""
+      " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">";
+
+  else if (strcmp(dt, "5") == 0)
+    s =
+      "<!DOCTYPE html>";
+
+  else if (strcmp(dt, "1.1") == 0)
+    s =
+      "<!DOCTYPE html PUBLIC"
+      " \"-//W3C//DTD XHTML 1.1//EN\""
+      " \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
+
+  else if (strcasecmp(dt, "basic") == 0)
+    s =
+      "<!DOCTYPE html PUBLIC"
+      " \"-//W3C//DTD XHTML Basic 1.1//EN\""
+      " \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\">";
+
+  else if (strcasecmp(dt, "mobile") == 0)
+    s =
+      "<!DOCTYPE html PUBLIC"
+      " \"-//WAPFORUM//DTD XHTML Mobile 1.2//EN\""
+      " \"http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd\">";
+
+  else if (strcasecmp(dt, "rdfa") == 0)
+    s =
+      "<!DOCTYPE html PUBLIC"
+      " \"-//W3C//DTD XHTML+RDFa 1.0//EN\""
+      " \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">";
+
+  return fara_t(s);
+}
+
 fara_node *fara_haml_parse(const char *s)
 {
   if (haml_parser == NULL) haml_parser_init();
@@ -256,6 +316,11 @@ fara_node *fara_haml_parse(const char *s)
   }
 
   flu_list_free(hes);
+
+  // doctype
+
+  char *dt = fabr_lookup_string(s, t, "dt");
+  if (dt) { fara_node_push(r, doctype(dt)); free(dt); }
 
   // haml
 
