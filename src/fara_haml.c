@@ -150,7 +150,7 @@ static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
   flu_list *ents = fabr_tree_list_named(t, "jsentry");
   for (flu_node *en = ents->first; en; en = en->next)
   {
-    flu_list_set(
+    flu_list_setk(
       nn->atts,
       fabr_lookup_string(s, en->item, "k"),
       fabr_lookup_string(s, en->item, "v"));
@@ -237,7 +237,7 @@ fara_node *fara_haml_parse(const char *s)
 
   for (flu_node *n = hes->first; n; n = n->next)
   {
-    flu_list_set(
+    flu_list_setk(
       r->atts,
       fabr_lookup_string(s, n->item, "k"),
       fabr_lookup_string(s, n->item, "v"));
@@ -257,6 +257,10 @@ fara_node *fara_haml_parse(const char *s)
   flu_list_free(ls);
 
   while (r->parent) r = r->parent;
+
+  // over
+
+  fabr_tree_free(t);
 
   return r;
 }

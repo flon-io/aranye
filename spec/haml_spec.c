@@ -11,11 +11,20 @@
 
 context "haml:"
 {
+  before each
+  {
+    fara_node *n = NULL;
+  }
+  after each
+  {
+    fara_node_free(n);
+  }
+
   describe "fara_haml_parse()"
   {
     it "parses a haml line %h1"
     {
-      fara_node *n = fara_haml_parse(
+      n = fara_haml_parse(
         "%h1");
 
       expect(fara_node_to_html(n, 1) ===f ""
@@ -25,7 +34,7 @@ context "haml:"
 
     it "parses a haml line #id.class{ x: y }"
     {
-      fara_node *n = fara_haml_parse(
+      n = fara_haml_parse(
         "#id.class{ x: y }");
 
       expect(fara_node_to_html(n, 1) ===f ""
@@ -35,7 +44,7 @@ context "haml:"
 
     it "parses a haml line .ca.cb"
     {
-      fara_node *n = fara_haml_parse(
+      n = fara_haml_parse(
         ".ca.cb");
 
       expect(fara_node_to_html(n, 1) ===f ""
@@ -45,7 +54,7 @@ context "haml:"
 
     it "parses a haml hierarchy"
     {
-      fara_node *n = fara_haml_parse(
+      n = fara_haml_parse(
         "#menu\n"
         "  .about\n"
         "    blah 0\n"
@@ -65,7 +74,7 @@ context "haml:"
 
     it "parses a jekyll-esque header"
     {
-      fara_node *n = fara_haml_parse(
+      n = fara_haml_parse(
         "---\n"
         "layout: my-layout\n"
         "title: xyz\n"
