@@ -282,7 +282,7 @@ static fara_node *doctype(const char *dt)
   return fara_t(s);
 }
 
-fara_node *fara_haml_parse(const char *s)
+fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
 {
   if (haml_parser == NULL) haml_parser_init();
 
@@ -338,6 +338,19 @@ fara_node *fara_haml_parse(const char *s)
   // over
 
   fabr_tree_free(t);
+
+  return r;
+}
+
+fara_node *fara_haml_parse_s(const char *s)
+{
+  flu_dict *callbacks = flu_list_malloc();
+  flu_dict *data = flu_list_malloc();
+
+  fara_node *r = fara_haml_parse(s, callbacks, data);
+
+  flu_list_free(callbacks);
+  flu_list_free_all(data);
 
   return r;
 }

@@ -20,11 +20,11 @@ context "haml:"
     fara_node_free(n);
   }
 
-  describe "fara_haml_parse()"
+  describe "fara_haml_parse_s()"
   {
     it "parses a haml line %h1"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         "%h1");
 
       expect(fara_node_to_html(n, 1) ===f ""
@@ -34,7 +34,7 @@ context "haml:"
 
     it "parses a haml line #id.class{ x: y }"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         "#id.class{ x: y }");
 
       expect(fara_node_to_html(n, 1) ===f ""
@@ -44,7 +44,7 @@ context "haml:"
 
     it "parses a haml line .ca.cb"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         ".ca.cb");
 
       expect(fara_node_to_html(n, 1) ===f ""
@@ -54,7 +54,7 @@ context "haml:"
 
     it "parses a haml hierarchy"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         "#menu\n"
         "  .about\n"
         "    blah 0\n"
@@ -74,7 +74,7 @@ context "haml:"
 
     it "parses a jekyll-esque header"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         "---\n"
         "layout: my-layout\n"
         "title: xyz\n"
@@ -98,7 +98,7 @@ context "haml:"
 
     it "leverages document headers"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         "---\n"
         "title: cave canem\n"
         "---\n"
@@ -121,7 +121,7 @@ context "haml:"
 
     it "understands !!!"
     {
-      n = fara_haml_parse(
+      n = fara_haml_parse_s(
         "!!!\n"
         "%h1\n"
         "  big title\n");
