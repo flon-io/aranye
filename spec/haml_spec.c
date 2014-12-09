@@ -33,6 +33,16 @@ context "haml:"
         "</div>\n");
     }
 
+    it "parses a haml line .ca.cb"
+    {
+      fara_node *n = fara_haml_parse(
+        ".ca.cb");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"ca cb\">\n"
+        "</div>\n");
+    }
+
     it "parses a haml hierarchy"
     {
       fara_node *n = fara_haml_parse(

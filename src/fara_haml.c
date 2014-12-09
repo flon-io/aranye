@@ -56,7 +56,7 @@ void haml_parser_init()
       NULL);
 
   fabr_parser *htatts =
-    fabr_string("( x=\"y\" )");
+    fabr_string("( x=\"y\" )"); // TODO
 
   fabr_parser *tic =
     fabr_n_alt(
