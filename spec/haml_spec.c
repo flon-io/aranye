@@ -62,6 +62,30 @@ context "haml:"
         "  </div>\n"
         "</div>\n");
     }
+
+    it "parses a jekyll-esque header"
+    {
+      fara_node *n = fara_haml_parse(
+        "---\n"
+        "layout: my-layout\n"
+        "title: xyz\n"
+        "---\n"
+        "\n"
+        "#menu\n"
+        "  .about\n"
+        "    blah 0\n");
+
+      expect(n->atts != NULL);
+      expect(flu_list_get(n->atts, "layout") === "my-layout");
+      expect(flu_list_get(n->atts, "title") === "xyz");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div id=\"menu\">\n"
+        "  <div class=\"about\">\n"
+        "    blah 0\n"
+        "  </div>\n"
+        "</div>\n");
+    }
   }
 }
 

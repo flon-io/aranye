@@ -108,9 +108,26 @@ void haml_parser_init()
       blank_line,
       NULL);
 
+  fabr_parser *hentry =
+    fabr_n_seq(
+      "he",
+      fabr_n_rex("k", "[^: \t\n\r]+"),
+      fabr_rex("[ \t]*:[ \t]*"),
+      fabr_n_rex("v", "[^ \t\n\r]+"),
+      fabr_rex("[\r\n]+"),
+      NULL);
+
+  fabr_parser *headers =
+    fabr_n_seq(
+      "hes",
+      fabr_rex("---[ \t]*[\n\r]+"),
+      hentry, fabr_q("*"),
+      fabr_rex("---[ \t]*"),
+      NULL);
+
   haml_parser =
     fabr_seq(
-      line,
+      fabr_alt(headers, line, NULL),
       fabr_seq(
         fabr_rex("[\n\r]"),
         line,
@@ -154,6 +171,7 @@ static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
     fara_node_add_class(nn, cl);
     free(cl);
   }
+  flu_list_free(cs);
 
   // id
 
@@ -162,11 +180,7 @@ static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
 
   // push to parent
 
-  if (i > ci)
-  {
-    fara_node_push(n, nn);
-  }
-  else if (i == ci)
+  if (i == ci)
   {
     fara_node_push(n->parent, nn);
   }
@@ -192,7 +206,7 @@ static fara_node *stack(fara_node *n, const char *s, fabr_tree *t)
     return stack_ell(n, s, t);
   if (strcmp(t->name, "txl") == 0)
     return stack_txl(n, s, t);
-  //else ?
+  //else
   return n;
 }
 
@@ -215,14 +229,32 @@ fara_node *fara_haml_parse(const char *s)
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
   r->data = (void *)-1; // ;-)
 
-  flu_list *ls = fabr_tree_list_named(t, "l");
+  // headers
 
+  flu_list *hes = fabr_tree_list_named(t, "he");
+
+  if (hes->size > 0) r->atts = flu_list_malloc();
+
+  for (flu_node *n = hes->first; n; n = n->next)
+  {
+    flu_list_set(
+      r->atts,
+      fabr_lookup_string(s, n->item, "k"),
+      fabr_lookup_string(s, n->item, "v"));
+  }
+
+  flu_list_free(hes);
+
+  // haml
+
+  flu_list *ls = fabr_tree_list_named(t, "l");
   for (flu_node *n = ls->first; n; n = n->next)
   {
     fabr_tree *nl = ((fabr_tree *)n->item)->child;
     //puts("---"); flu_putf(fabr_tree_to_string(nl, s, 1));
     r = stack(r, s, nl);
   }
+  flu_list_free(ls);
 
   while (r->parent) r = r->parent;
 
