@@ -95,6 +95,29 @@ context "haml:"
         "  </div>\n"
         "</div>\n");
     }
+
+    it "leverages document headers"
+    {
+      n = fara_haml_parse(
+        "---\n"
+        "title: cave canem\n"
+        "---\n"
+        "\n"
+        "%h1= title\n"
+        ".nada\n"
+        "  lore ipsum nada\n");
+
+      expect(n->atts != NULL);
+      expect(flu_list_get(n->atts, "title") === "cave canem");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<h1>\n"
+        "cave canem\n"
+        "</h1>\n"
+        "<div class=\"nada\">\n"
+        "  lore ipsum nada\n"
+        "</div>\n");
+    }
   }
 }
 

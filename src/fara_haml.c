@@ -70,7 +70,7 @@ void haml_parser_init()
     fabr_n_rex("ind", "[ ]*");
 
   fabr_parser *eval_eol =
-    fabr_n_seq("eveol", fabr_str("="), fabr_rex("[^\r\n]*"), NULL);
+    fabr_seq(fabr_str("="), fabr_n_rex("ev", "[^\r\n]*"), NULL);
 
   fabr_parser *blank_line =
     fabr_n_rex("bll", "[ \t]*");
@@ -88,7 +88,7 @@ void haml_parser_init()
     fabr_n_seq( "fil", ind, fabr_rex(":[a-z]+"), NULL);
 
   fabr_parser *eval_line =
-    fabr_n_seq("evl", fabr_string("="), fabr_rex("[^\r\n]*"), NULL);
+    fabr_n_seq("evl", fabr_string("="), fabr_n_rex("ev", "[^\r\n]*"), NULL);
 
   fabr_parser *elt_line =
     fabr_n_seq(
@@ -113,8 +113,8 @@ void haml_parser_init()
       "he",
       fabr_n_rex("k", "[^: \t\n\r]+"),
       fabr_rex("[ \t]*:[ \t]*"),
-      fabr_n_rex("v", "[^ \t\n\r]+"),
-      fabr_rex("[\r\n]+"),
+      fabr_n_rex("v", "[^\n\r]+"),
+      fabr_rex("[\n\r]+"),
       NULL);
 
   fabr_parser *headers =
@@ -177,6 +177,18 @@ static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
 
   char *id = fabr_lookup_string(s, t, "id");
   if (id) flu_list_set(nn->atts, "id", id);
+
+  // ev (%h1 = title)
+
+  char *ev = fabr_lookup_string(s, t, "ev");
+  if (ev)
+  {
+    fara_node *doc = n; while (doc->parent) doc = doc->parent;
+    char *k = flu_strtrim(ev); free(ev);
+    char *v = doc->atts ? flu_list_get(doc->atts, k) : v;
+    if (v) fara_node_push(nn, fara_t(v));
+    free(k);
+  }
 
   // push to parent
 

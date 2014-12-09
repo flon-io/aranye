@@ -51,6 +51,11 @@ fara_node *fara_node_malloc(char *t, flu_dict *atts)
   return r;
 }
 
+fara_node *fara_text(char *t)
+{
+  return fara_node_malloc(t, NULL);
+}
+
 fara_node *fara_n(const char *tag, ...)
 {
   va_list ap; va_start(ap, tag);
