@@ -113,7 +113,7 @@ void haml_parser_init()
   fabr_parser *doctype =
     fabr_seq(
       fabr_rex("!!![ \t]*"),
-      fabr_n_rex("dt", "[^ \t\n\r]*"),
+      fabr_n_rex("dt", "[^\n\r]*"),
       fabr_rex("[\n\r]+"),
       NULL);
 
@@ -243,56 +243,6 @@ static fara_node *stack(fara_node *n, const char *s, fabr_tree *t)
   return n;
 }
 
-static fara_node *doctype(const char *dt)
-{
-  char *s =
-    "<!DOCTYPE html PUBLIC"
-    " \"-//W3C//DTD XHTML 1.0 Transitional//EN\""
-    " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">";
-
-  if (strcasecmp(dt, "strict") == 0)
-    s =
-      "<!DOCTYPE html PUBLIC"
-      " \"-//W3C//DTD XHTML 1.0 Strict//EN\""
-      " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">";
-
-  else if (strcasecmp(dt, "frameset") == 0)
-    s =
-      "<!DOCTYPE html PUBLIC"
-      " \"-//W3C//DTD XHTML 1.0 Frameset//EN\""
-      " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">";
-
-  else if (strcmp(dt, "5") == 0)
-    s =
-      "<!DOCTYPE html>";
-
-  else if (strcmp(dt, "1.1") == 0)
-    s =
-      "<!DOCTYPE html PUBLIC"
-      " \"-//W3C//DTD XHTML 1.1//EN\""
-      " \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
-
-  else if (strcasecmp(dt, "basic") == 0)
-    s =
-      "<!DOCTYPE html PUBLIC"
-      " \"-//W3C//DTD XHTML Basic 1.1//EN\""
-      " \"http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd\">";
-
-  else if (strcasecmp(dt, "mobile") == 0)
-    s =
-      "<!DOCTYPE html PUBLIC"
-      " \"-//WAPFORUM//DTD XHTML Mobile 1.2//EN\""
-      " \"http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd\">";
-
-  else if (strcasecmp(dt, "rdfa") == 0)
-    s =
-      "<!DOCTYPE html PUBLIC"
-      " \"-//W3C//DTD XHTML+RDFa 1.0//EN\""
-      " \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">";
-
-  return fara_t(s);
-}
-
 void *default_header_callback(const char *s, void *args)
 {
   fara_node *page = args;
@@ -357,7 +307,7 @@ fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
   // doctype
 
   char *dt = fabr_lookup_string(s, t, "dt");
-  if (dt) { fara_node_push(r, doctype(dt)); free(dt); }
+  if (dt) { fara_node_push(r, fara_t("<!DOCTYPE html>")); free(dt); }
 
   // haml
 

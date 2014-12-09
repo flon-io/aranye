@@ -127,7 +127,7 @@ context "haml:"
         "  big title\n");
 
       expect(fara_node_to_html(n, 1) ===f ""
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+        "<!DOCTYPE html>\n"
         "<h1>\n"
         "  big title\n"
         "</h1>\n");
