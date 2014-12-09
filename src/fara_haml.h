@@ -30,7 +30,7 @@
 
 #include "fara_dom.h"
 
-typedef void *fara_haml_callback(const char *s, void *data);
+typedef void *fara_haml_callback(const char *s, void *args);
 
 fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data);
 fara_node *fara_haml_parse_s(const char *s);
