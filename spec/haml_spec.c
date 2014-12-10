@@ -20,12 +20,13 @@ context "haml:"
     fara_node_free(n);
   }
 
-  describe "fara_haml_parse_s()"
+  describe "fara_haml_parse()"
   {
     it "parses a haml line %h1"
     {
-      n = fara_haml_parse_s(
-        "%h1");
+      n = fara_haml_parse(
+        "%h1",
+        NULL, NULL);
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<h1>\n"
@@ -34,8 +35,9 @@ context "haml:"
 
     it "parses a haml line #id.class{ x: y }"
     {
-      n = fara_haml_parse_s(
-        "#id.class{ x: y }");
+      n = fara_haml_parse(
+        "#id.class{ x: y }",
+        NULL, NULL);
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div id=\"id\" class=\"class\" x=\"y\">\n"
@@ -44,8 +46,9 @@ context "haml:"
 
     it "parses a haml line .ca.cb"
     {
-      n = fara_haml_parse_s(
-        ".ca.cb");
+      n = fara_haml_parse(
+        ".ca.cb",
+        NULL, NULL);
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div class=\"ca cb\">\n"
@@ -54,12 +57,13 @@ context "haml:"
 
     it "parses a haml hierarchy"
     {
-      n = fara_haml_parse_s(
+      n = fara_haml_parse(
         "#menu\n"
         "  .about\n"
         "    blah 0\n"
         "  .links\n"
-        "    blah 1");
+        "    blah 1",
+        NULL, NULL);
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div id=\"menu\">\n"
@@ -74,7 +78,7 @@ context "haml:"
 
     it "parses a jekyll-esque header"
     {
-      n = fara_haml_parse_s(
+      n = fara_haml_parse(
         "---\n"
         "layout: my-layout\n"
         "title: xyz\n"
@@ -82,7 +86,8 @@ context "haml:"
         "\n"
         "#menu\n"
         "  .about\n"
-        "    blah 0\n");
+        "    blah 0\n",
+        NULL, NULL);
 
       expect(n->atts != NULL);
       expect(flu_list_get(n->atts, "layout") === "my-layout");
@@ -98,14 +103,15 @@ context "haml:"
 
     it "leverages document headers"
     {
-      n = fara_haml_parse_s(
+      n = fara_haml_parse(
         "---\n"
         "title: cave canem\n"
         "---\n"
         "\n"
         "%h1= title\n"
         ".nada\n"
-        "  lore ipsum nada\n");
+        "  lore ipsum nada\n",
+        NULL, NULL);
 
       expect(n->atts != NULL);
       expect(flu_list_get(n->atts, "title") === "cave canem");
@@ -121,10 +127,11 @@ context "haml:"
 
     it "understands !!!"
     {
-      n = fara_haml_parse_s(
+      n = fara_haml_parse(
         "!!!\n"
         "%h1\n"
-        "  big title\n");
+        "  big title\n",
+        NULL, NULL);
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<!DOCTYPE html>\n"

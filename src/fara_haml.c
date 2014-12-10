@@ -337,16 +337,3 @@ fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
   return r;
 }
 
-fara_node *fara_haml_parse_s(const char *s)
-{
-  flu_dict *callbacks = flu_list_malloc();
-  flu_dict *data = flu_list_malloc();
-
-  fara_node *r = fara_haml_parse(s, callbacks, data);
-
-  flu_list_free(callbacks);
-  flu_list_free_all(data);
-
-  return r;
-}
-

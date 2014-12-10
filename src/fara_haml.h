@@ -32,8 +32,10 @@
 
 typedef void *fara_haml_callback(const char *s, fara_node *n, void *data);
 
-fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data);
-fara_node *fara_haml_parse_s(const char *s);
+fara_node *fara_haml_parse(
+  const char *s, flu_dict *callbacks, void *data);
+//fara_node *fara_haml_parse_f(
+//  const char *path, flu_dict *callbacks, void *data);
 
 #endif // FLON_FARA_HAML_H
 
