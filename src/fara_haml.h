@@ -30,12 +30,21 @@
 
 #include "fara_dom.h"
 
+
 typedef void *fara_haml_callback(const char *s, fara_node *n, void *data);
 
+/* Interprets the given HAML and returns the fara_node corresponding to it.
+ */
 fara_node *fara_haml_parse(
   const char *s, flu_dict *callbacks, void *data);
-//fara_node *fara_haml_parse_f(
-//  const char *path, flu_dict *callbacks, void *data);
+
+/* Reads a file and generates a fara_node from it.
+ *
+ * Expects the first to last arg to be `flu_dict *callbacks` and the
+ * last arg to be `void *data`, matching fara_haml_parse().
+ */
+fara_node *fara_haml_parse_f(
+  const char *path, ...);
 
 #endif // FLON_FARA_HAML_H
 

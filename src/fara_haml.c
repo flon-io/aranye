@@ -238,7 +238,6 @@ static fara_node *stack(
 
 void *default_header_callback(const char *s, fara_node *n, void *data)
 {
-  printf("dhc node: %p\n", n);
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
   fabr_tree *t = fabr_parse_all(s, 0, header_parser);
@@ -333,6 +332,27 @@ fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
 
   fabr_tree_free(t);
   if (own_callbacks) flu_list_free(callbacks);
+
+  return r;
+}
+
+fara_node *fara_haml_parse_f(const char *path, ...)
+{
+  va_list ap; va_start(ap, path);
+
+  char *pa = flu_svprintf(path, ap);
+  flu_dict *callbacks = va_arg(ap, flu_dict *);
+  void *data = va_arg(ap, void *);
+
+  va_end(ap);
+
+  char *s = flu_readall(pa);
+  if (s == NULL) { free(pa); return NULL; }
+
+  fara_node *r = fara_haml_parse(s, callbacks, data);
+
+  free(s);
+  free(pa);
 
   return r;
 }

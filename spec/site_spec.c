@@ -11,9 +11,29 @@
 
 context "site:"
 {
-  describe "x()"
+  before each
   {
-    it "flips burgers"
+    fara_node *n = NULL;
+  }
+  after each
+  {
+    fara_node_free(n);
+  }
+
+  describe "fara_haml_parse_f()"
+  {
+    it "parses a standalone haml file"
+    {
+      n = fara_haml_parse_f("../spec/site/%s", "standalone.haml", NULL, NULL);
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<h1>\n"
+        "flying cows\n"
+        "</h1>\n"
+        "<p>\n"
+        "  We've seen flying cows.\n"
+        "</p>\n");
+    }
   }
 }
 
