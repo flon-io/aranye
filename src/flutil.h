@@ -228,6 +228,12 @@ typedef struct flu_list {
  */
 flu_list *flu_list_malloc();
 
+/* Creates a new list, with all the given elements.
+ * Expects a NULL to stop the list of elements. Yes, no NULL elements when
+ * weaving a list from this method.
+ */
+flu_list *flu_l(void *elt0, ...);
+
 /* Frees a flu_list and all its nodes. But doesn't attempt freeing the
  * items in the nodes.
  */
@@ -302,6 +308,15 @@ void flu_list_oinsert(
 /* Performs an insertion sort (in place) of the flu_list.
  */
 void flu_list_isort(flu_list *l, int (*cmp)(const void *, const void *));
+
+/* Adds [links to] the elements of from at the end of to.
+ */
+void flu_list_concat(flu_list *to, flu_list *from);
+
+/* Returns a string representation of the given flu_list.
+ * Warning: only works when all the values are strings.
+ */
+char *flu_list_to_s(flu_list *l);
 
 //
 // flu_list dictionary functions

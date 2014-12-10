@@ -636,6 +636,19 @@ flu_list *flu_list_malloc()
   return l;
 }
 
+flu_list *flu_l(void *elt0, ...)
+{
+  va_list ap; va_start(ap, elt0);
+
+  flu_list *r = flu_list_malloc();
+
+  for (void *e = elt0; e; e = va_arg(ap, void *)) flu_list_add(r, e);
+
+  va_end(ap);
+
+  return r;
+}
+
 void flu_list_free(flu_list *l)
 {
   if (l == NULL) return;
@@ -767,6 +780,35 @@ void flu_list_isort(flu_list *l, int (*cmp)(const void *, const void *))
   free(ll);
 }
 
+void flu_list_concat(flu_list *to, flu_list *from)
+{
+  for (flu_node *n = from->first; n; n = n->next)
+  {
+    flu_list_add(to, n->item);
+    if (n->key) to->last->key = strdup(n->key);
+  }
+}
+
+char *flu_list_to_s(flu_list *l)
+{
+  if (l == NULL) return strdup("(null flu_list)");
+
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  short isdict = (l->first && l->first->key);
+
+  flu_sbputc(b, isdict ? '{' : '[');
+  for (flu_node *n = l->first; n; n = n->next)
+  {
+    if (n != l->first) flu_sbputc(b, ',');
+    if (isdict) flu_sbprintf(b, "%s:", n->key);
+    flu_sbputs( b, (char *)n->item);
+  }
+  flu_sbputc(b, isdict ? '}' : ']');
+
+  return flu_sbuffer_to_string(b);
+}
+
 void flu_list_set(flu_list *l, const char *key, void *item)
 {
   //flu_list_unshift(l, item); l->first->key = strdup(key);
@@ -852,9 +894,7 @@ flu_list *flu_vsd(va_list ap)
     char *vf = va_arg(ap, char *);
     char *v = vf ? flu_svprintf(vf, ap) : NULL;
 
-    flu_list_set(d, k, v);
-
-    free(k);
+    flu_list_setk(d, k, v);
   }
 
   return d;
@@ -870,10 +910,10 @@ flu_list *flu_sd(char *kf0, ...)
   char *v0 = vf0 ? flu_svprintf(vf0, ap) : NULL;
 
   flu_list *d = flu_vsd(ap);
+
   va_end(ap);
 
-  flu_list_set(d, k0, v0);
-  free(k0);
+  flu_list_setk(d, k0, v0);
 
   return d;
 }
