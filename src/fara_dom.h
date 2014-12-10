@@ -44,6 +44,8 @@ fara_node *fara_text(char *text);
 fara_node *fara_n(const char *tag, ...);
 fara_node *fara_t(const char *text, ...);
 
+char *fara_node_to_s(fara_node *n);
+
 void fara_node_free(fara_node *n);
 
 void fara_node_push(fara_node *parent, fara_node *child);

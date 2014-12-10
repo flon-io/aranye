@@ -75,6 +75,24 @@ fara_node *fara_t(const char *text, ...)
   return fara_node_malloc(t, NULL);
 }
 
+char *fara_node_to_s(fara_node *n)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  if (n)
+  {
+    ssize_t as = n->atts ? n->atts->size : -1;
+    ssize_t cs = n->children ? n->children->size : -1;
+
+    flu_sbprintf(
+      b,
+      "(fara_node %p p%p t\"%s\" a%li c%li)",
+      n, n->parent, n->t, as, cs);
+  }
+
+  return flu_sbuffer_to_string(b);
+}
+
 void fara_node_free(fara_node *n)
 {
   if (n == NULL) return;
