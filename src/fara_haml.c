@@ -135,15 +135,6 @@ void haml_parser_init()
         fabr_r("*")),
       NULL);
 
-  //fabr_parser *hentry =
-  //  fabr_n_seq(
-  //    "he",
-  //    fabr_n_rex("k", "[^: \t\n\r]+"),
-  //    fabr_rex("[ \t]*:[ \t]*"),
-  //    fabr_n_rex("v", "[^\n\r]+"),
-  //    fabr_rex("[\n\r]+"),
-  //    NULL);
-
   header_parser =
     fabr_rep(
       fabr_n_seq(
@@ -156,7 +147,8 @@ void haml_parser_init()
       0, -1);
 }
 
-static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
+static fara_node *stack_ell(
+  fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
 {
   //puts("---"); flu_putf(fabr_tree_to_string(t, s, 1));
 
@@ -165,6 +157,18 @@ static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
 
   fara_node *nn = fara_node_malloc(NULL, flu_list_malloc());
   nn->data = (void *)i; // ;-)
+
+  // push to parent
+
+  if (i == ci)
+  {
+    fara_node_push(n->parent, nn);
+  }
+  else
+  {
+    while (i < ci) { n = n->parent; ci = (int)n->data; }
+    fara_node_push(n, nn);
+  }
 
   // attributes
 
@@ -204,47 +208,37 @@ static fara_node *stack_ell(fara_node *n, const char *s, fabr_tree *t)
   char *ev = fabr_lookup_string(s, t, "ev");
   if (ev)
   {
-    fara_node *doc = n; while (doc->parent) doc = doc->parent;
-    char *k = flu_strtrim(ev); free(ev);
-    char *v = doc->atts ? flu_list_get(doc->atts, k) : v;
-    if (v) fara_node_push(nn, fara_t(v));
-    free(k);
-  }
-
-  // push to parent
-
-  if (i == ci)
-  {
-    fara_node_push(n->parent, nn);
-  }
-  else
-  {
-    while (i < ci) { n = n->parent; ci = (int)n->data; }
-    fara_node_push(n, nn);
+    fara_haml_callback *cb = flu_list_get(cbs, "eval");
+    fara_node *res = cb(ev, nn, NULL);
+    free(ev);
+    if (res) fara_node_push(nn, res);
   }
 
   return nn;
 }
 
-static fara_node *stack_txl(fara_node *n, const char *s, fabr_tree *t)
+static fara_node *stack_txl(
+  fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
 {
   fara_node_push(n, fara_node_malloc(fabr_tree_string(s, t), NULL));
 
   return n;
 }
 
-static fara_node *stack(fara_node *n, const char *s, fabr_tree *t)
+static fara_node *stack(
+  fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
 {
   if (strcmp(t->name, "ell") == 0)
-    return stack_ell(n, s, t);
+    return stack_ell(n, s, cbs, data, t);
   if (strcmp(t->name, "txl") == 0)
-    return stack_txl(n, s, t);
+    return stack_txl(n, s, cbs, data, t);
   //else
   return n;
 }
 
 void *default_header_callback(const char *s, fara_node *n, void *data)
 {
+  printf("dhc node: %p\n", n);
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
   fabr_tree *t = fabr_parse_all(s, 0, header_parser);
@@ -265,9 +259,21 @@ void *default_header_callback(const char *s, fara_node *n, void *data)
   return NULL;
 }
 
+void *default_eval_callback(const char *s, fara_node *n, void *data)
+{
+  char *k = flu_strtrim(s);
+  fara_node *doc = n; while (doc->parent) doc = doc->parent;
+  char *v = doc->atts ? flu_list_get(doc->atts, k) : NULL;
+  free(k);
+
+  return v ? fara_t(v) : NULL;
+}
+
 fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
 {
   if (haml_parser == NULL) haml_parser_init();
+
+  // prepare callbacks
 
   int own_callbacks = 0;
   if (callbacks == NULL)
@@ -275,7 +281,9 @@ fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
     callbacks = flu_list_malloc();
     own_callbacks = 1;
   }
+
   flu_list_set_last(callbacks, "header", default_header_callback);
+  flu_list_set_last(callbacks, "eval", default_eval_callback);
 
   //puts("[1;30m"); puts(fabr_parser_to_string(haml_parser)); puts("[0;0m");
   //fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
@@ -315,7 +323,7 @@ fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
   {
     fabr_tree *nl = ((fabr_tree *)n->item)->child;
     //puts("---"); flu_putf(fabr_tree_to_string(nl, s, 1));
-    r = stack(r, s, nl);
+    r = stack(r, s, callbacks, data, nl);
   }
   flu_list_free(ls);
 
