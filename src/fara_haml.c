@@ -351,8 +351,10 @@ fara_node *fara_haml_parse_f(const char *path, ...)
 
   fara_node *r = fara_haml_parse(s, callbacks, data);
 
+  if (r->atts == NULL) r->atts = flu_list_malloc();
+  flu_list_set(r->atts, "path", pa);
+
   free(s);
-  free(pa);
 
   return r;
 }

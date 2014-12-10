@@ -33,6 +33,9 @@ context "site:"
         "<p>\n"
         "  We've seen flying cows.\n"
         "</p>\n");
+
+      expect(flu_list_get(n->atts, "path") === ""
+        "../spec/site/standalone.haml");
     }
   }
 }
