@@ -243,21 +243,20 @@ static fara_node *stack(fara_node *n, const char *s, fabr_tree *t)
   return n;
 }
 
-void *default_header_callback(const char *s, void *args)
+void *default_header_callback(const char *s, fara_node *n, void *data)
 {
-  fara_node *page = args;
-  if (page->atts == NULL) page->atts = flu_list_malloc();
+  if (n->atts == NULL) n->atts = flu_list_malloc();
 
   fabr_tree *t = fabr_parse_all(s, 0, header_parser);
   //flu_putf(fabr_tree_to_string(t, s, 1));
 
   flu_list *es = fabr_tree_list_named(t, "e");
-  for (flu_node *n = es->first; n; n = n->next)
+  for (flu_node *en = es->first; en; en = en->next)
   {
     flu_list_setk(
-      page->atts,
-      fabr_lookup_string(s, n->item, "k"),
-      fabr_lookup_string(s, n->item, "v"));
+      n->atts,
+      fabr_lookup_string(s, en->item, "k"),
+      fabr_lookup_string(s, en->item, "v"));
   }
   flu_list_free(es);
 
@@ -300,7 +299,7 @@ fara_node *fara_haml_parse(const char *s, flu_dict *callbacks, void *data)
   if (hes)
   {
     fara_haml_callback *hcb = flu_list_get(callbacks, "header");
-    hcb(hes, r);
+    hcb(hes, r, NULL);
     free(hes);
   }
 
