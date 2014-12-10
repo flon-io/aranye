@@ -37,6 +37,31 @@ context "site:"
       expect(flu_list_get(n->atts, "path") === ""
         "../spec/site/standalone.haml");
     }
+
+    it "extrapolates a layout"
+    {
+      n = fara_haml_parse_f("../spec/site/%s", "index.haml", NULL, NULL);
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<!DOCTYPE html>\n"
+        "<html>\n"
+        "  <head>\n"
+        "    <title>\n"
+        "carpe diem\n"
+        "    </title>\n"
+        "  </head>\n"
+        "  <body>\n"
+        "    <p>\n"
+        "  This is our site.\n"
+        "    </p>\n"
+        "    <p>\n"
+        "  It sucks.\n"
+        "    </p>\n"
+        "  </body>\n"
+        "</html>\n");
+    }
+
+    it "renders partials"
   }
 }
 
