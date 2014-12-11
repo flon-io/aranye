@@ -33,8 +33,13 @@ clean:
 	rm -f *.so
 	rm -f *.c
 	rm -f s
+	rm -f fara
+	rm -f ../bin/fara
 
 .PHONY: spec vspec dspec clean
 
 fara: $(NAMES)
+
+bin: fara
+	cp fara ../bin/
 

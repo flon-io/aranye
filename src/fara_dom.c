@@ -77,7 +77,7 @@ fara_node *fara_t(const char *text, ...)
 
 void fara_node_render(flu_sbuffer *b, fara_node *n, int colour, ssize_t depth)
 {
-  if (n == NULL) return strdup("(null fara-node)");
+  if (n == NULL) { flu_sbputs(b, "(null fara-node)"); return; }
 
   char *atts = NULL;
   if (n->atts)
