@@ -318,6 +318,12 @@ void flu_list_concat(flu_list *to, flu_list *from);
  */
 char *flu_list_to_s(flu_list *l);
 
+/* Returns a string representation of the given flu_list.
+ * Instead of displaying the string values, displays their pointer info,
+ * so it works with any value (well pointers).
+ */
+char *flu_list_to_sp(flu_list *l);
+
 //
 // flu_list dictionary functions
 //
