@@ -200,7 +200,7 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
 
   for (flu_node *fn = n->children->first; fn; fn = fn->next)
   {
-    to_html(fn->item, flags, b, indent + n->t ? 1 : 0);
+    to_html(fn->item, flags, b, indent + (n->t ? 1 : 0));
   }
 
   if (n->t)

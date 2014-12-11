@@ -167,17 +167,16 @@ static void eval_and_push(flu_dict *callbacks, fara_node *n, const char *ev)
 {
   char *code = flu_strtrim(ev);
 
-  //printf("eval_and_push()\n");
-  //printf("  n: %s\n", fara_node_to_s(n));
-  //printf("  code: >%s<\n", code);
-
   fara_haml_callback *cb = flu_list_get(callbacks, "eval");
   fara_node *res = cb(code, n, NULL);
-  //printf("  res: %s\n", fara_node_to_s(res));
+
+  if (res)
+  {
+    if (strcmp(code, "content") == 0) fara_node_push(n->parent, res);
+    else fara_node_push(n, res);
+  }
 
   free(code);
-
-  if (res) fara_node_push(n, res);
 }
 
 static fara_node *stack_ell(
