@@ -172,8 +172,8 @@ static void eval_and_push(flu_dict *callbacks, fara_node *n, const char *ev)
 
   if (res)
   {
-    if (strcmp(code, "content") == 0) fara_node_push(n->parent, res);
-    else fara_node_push(n, res);
+    if (fara_node_is_text(res)) fara_node_push(n, res);
+    else fara_node_push(n->parent, res);
   }
 
   free(code);
@@ -286,15 +286,12 @@ void *default_header_callback(const char *s, fara_node *n, void *data)
 
 void *default_eval_callback(const char *s, fara_node *n, void *data)
 {
-  char *k = flu_strtrim(s);
   fara_node *doc = n; while (doc->parent) doc = doc->parent;
-  void *v = doc->atts ? flu_list_get(doc->atts, k) : NULL;
+  void *v = doc->atts ? flu_list_get(doc->atts, s) : NULL;
 
   fara_node *r = NULL;
-  if (strcmp(k, "content") == 0) r = v;
+  if (strcmp(s, "content") == 0) r = v;
   else if (v) r = fara_t(v);
-
-  free(k);
 
   return r;
 }
