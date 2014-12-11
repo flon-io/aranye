@@ -394,7 +394,6 @@ fara_node *fara_haml_parse_f(const char *path, ...)
   va_end(ap);
 
   flu_dict *rd = rootd ? rootd : flu_list_malloc();
-  flu_list_set(rd, "path", pa);
 
   fara_node *r = NULL;
 
@@ -433,6 +432,7 @@ fara_node *fara_haml_parse_f(const char *path, ...)
 
 _over:
 
+  free(pa);
   if (rootd == NULL) flu_list_free(rd);
 
   return r;
