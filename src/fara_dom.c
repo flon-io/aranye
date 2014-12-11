@@ -75,6 +75,10 @@ fara_node *fara_t(const char *text, ...)
   return fara_node_malloc(t, NULL);
 }
 
+int fara_node_is_tag(fara_node *n) { return (n->t && n->atts); }
+int fara_node_is_text(fara_node *n) { return (n->t && n->atts == NULL); }
+int fara_node_is_doc(fara_node *n) { return (n->t == NULL && n->atts == NULL); }
+
 void fara_node_render(flu_sbuffer *b, fara_node *n, int colour, ssize_t depth)
 {
   if (n == NULL) { flu_sbputs(b, "(null fara-node)"); return; }

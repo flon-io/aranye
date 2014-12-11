@@ -44,6 +44,10 @@ fara_node *fara_text(char *text);
 fara_node *fara_n(const char *tag, ...);
 fara_node *fara_t(const char *text, ...);
 
+int fara_node_is_tag(fara_node *n);
+int fara_node_is_text(fara_node *n);
+int fara_node_is_doc(fara_node *n);
+
 char *fara_node_to_s(fara_node *n);
 char *fara_node_to_st(fara_node *n, int colour);
 
