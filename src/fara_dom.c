@@ -75,11 +75,9 @@ fara_node *fara_t(const char *text, ...)
   return fara_node_malloc(t, NULL);
 }
 
-char *fara_node_to_s(fara_node *n)
+void fara_node_render(flu_sbuffer *b, fara_node *n, int colour, ssize_t depth)
 {
-  if (n == NULL) return strdup("(null)");
-
-  flu_sbuffer *b = flu_sbuffer_malloc();
+  if (n == NULL) return strdup("(null fara-node)");
 
   char *atts = NULL;
   if (n->atts)
@@ -101,12 +99,50 @@ char *fara_node_to_s(fara_node *n)
 
   ssize_t cs = n->children ? n->children->size : -1;
 
+  char *con = colour ? "[1;30m" : "";
+  char *cson = colour ? "[1;33m" : "";
+  char *caon = colour ? "[0;34m" : "";
+  char *coff = colour ? "[0;0m" : "";
+
+  char *t = n->t ? strndup(n->t, 24) : NULL;
+  if (t && strlen(t) > 20) strcpy(t + 21, "...\0");
+  ssize_t ts = n->t ? strlen(n->t) : -1;
+
   flu_sbprintf(
     b,
-    "(fara_node %p p%p t\"%s\" a%s c%li)",
-    n, n->parent, n->t, atts, cs);
+    "%*s%s(fara_node %p p%p t%s\"%s\"%s%li a%s%s%s c%li)%s",
+    depth < 0 ? 0 : depth * 2, "",
+    con,
+    n, n->parent, cson, t, con, ts, caon, atts, con, cs,
+    coff);
 
+  free(t);
   free(atts);
+
+  if (depth > -1 && n->children) // print children
+  {
+    for (flu_node *fn = n->children->first; fn; fn = fn->next)
+    {
+      flu_sbputc(b, '\n');
+      fara_node_render(b, fn->item, colour, depth + 1);
+    }
+  }
+}
+
+char *fara_node_to_s(fara_node *n)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  fara_node_render(b, n, 0, -1);
+
+  return flu_sbuffer_to_string(b);
+}
+
+char *fara_node_to_st(fara_node *n, int colour)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  fara_node_render(b, n, colour, 0);
 
   return flu_sbuffer_to_string(b);
 }

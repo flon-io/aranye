@@ -42,6 +42,8 @@ context "site:"
     {
       n = fara_haml_parse_f("../spec/site/%s", "index.haml", NULL, NULL);
 
+      flu_putf(fara_node_to_st(n, 1));
+
       expect(fara_node_to_html(n, 1) ===f ""
         "<!DOCTYPE html>\n"
         "<html>\n"
