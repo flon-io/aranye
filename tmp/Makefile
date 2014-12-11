@@ -37,3 +37,5 @@ clean:
 
 .PHONY: spec vspec dspec clean
 
+fara: $(NAMES)
+
