@@ -77,18 +77,36 @@ fara_node *fara_t(const char *text, ...)
 
 char *fara_node_to_s(fara_node *n)
 {
+  if (n == NULL) return strdup("(null)");
+
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  if (n)
+  char *atts = NULL;
+  if (n->atts)
   {
-    ssize_t as = n->atts ? n->atts->size : -1;
-    ssize_t cs = n->children ? n->children->size : -1;
-
-    flu_sbprintf(
-      b,
-      "(fara_node %p p%p t\"%s\" a%li c%li)",
-      n, n->parent, n->t, as, cs);
+    flu_sbuffer *ab = flu_sbuffer_malloc();
+    flu_sbputc(ab, '{');
+    for (flu_node *fn = n->atts->first; fn; fn = fn->next)
+    {
+      if (fn != n->atts->first) flu_sbputc(ab, ',');
+      flu_sbputs(ab, fn->key);
+    }
+    flu_sbputc(ab, '}');
+    atts = flu_sbuffer_to_string(ab);
   }
+  else
+  {
+    atts = strdup("-1");
+  }
+
+  ssize_t cs = n->children ? n->children->size : -1;
+
+  flu_sbprintf(
+    b,
+    "(fara_node %p p%p t\"%s\" a%s c%li)",
+    n, n->parent, n->t, atts, cs);
+
+  free(atts);
 
   return flu_sbuffer_to_string(b);
 }

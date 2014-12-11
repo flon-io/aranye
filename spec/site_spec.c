@@ -51,17 +51,26 @@ context "site:"
         "    </title>\n"
         "  </head>\n"
         "  <body>\n"
+        "    <div class=\"header\">\n"
+        "      header\n"
+        "    </div>\n"
+        "    <h1>\n"
+        "carpe diem\n"
+        "    </h1>\n"
         "    <p>\n"
         "  This is our site.\n"
         "    </p>\n"
         "    <p>\n"
         "  It sucks.\n"
         "    </p>\n"
+        "    <div class=\"footer\">\n"
+        "      footer\n"
+        "    </div>\n"
         "  </body>\n"
         "</html>\n");
     }
 
-    it "renders partials"
+    it "includes"
   }
 }
 
