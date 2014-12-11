@@ -147,23 +147,20 @@ void haml_parser_init()
       0, -1);
 }
 
-static void push_to_parent(
+static fara_node *push_to_parent(
   fara_node *current, fabr_tree *newt, fara_node *newn)
 {
-  int ci = (int)current->data;
   int i = newt->child->length; // first child is "ind"
-
   newn->data = (void *)i; // ;-)
 
-  if (i == ci)
+  while (1)
   {
-    fara_node_push(current->parent, newn);
+    int ci = (int)current->data;
+    if (i > ci) { fara_node_push(current, newn); break; }
+    current = current->parent;
   }
-  else
-  {
-    while (i < ci) { current = current->parent; ci = (int)current->data; }
-    fara_node_push(current, newn);
-  }
+
+  return newn;
 }
 
 static void eval_and_push(flu_dict *callbacks, fara_node *n, const char *ev)
@@ -190,7 +187,7 @@ static fara_node *stack_ell(
 
   fara_node *nn = fara_node_malloc(NULL, flu_list_malloc());
 
-  push_to_parent(n, t, nn);
+  fara_node *nextn = push_to_parent(n, t, nn);
 
   // attributes
 
@@ -234,7 +231,9 @@ static fara_node *stack_ell(
     free(ev);
   }
 
-  return nn;
+  // over.
+
+  return nextn;
 }
 
 static fara_node *stack_evl(
