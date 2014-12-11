@@ -380,13 +380,13 @@ fara_node *fara_haml_parse_s(
   return fara_haml_parse(s, NULL, NULL, NULL);
 }
 
-static char *find_layouts_dir(const char *start_path)
+static char *find_dir(const char *dirname, const char *start_path)
 {
   char *r = NULL;
 
   char *pa = flu_dirname(start_path);
 
-  char *pal = flu_path("%s/layouts", pa);
+  char *pal = flu_path("%s/%s", pa, dirname);
   char *ppa = NULL;
 
   if (flu_fstat(pal) == 'd') { r = pal; goto _over; }
@@ -396,7 +396,7 @@ static char *find_layouts_dir(const char *start_path)
 
   ppa = flu_path("%s/..", pa);
 
-  r = find_layouts_dir(ppa);
+  r = find_dir(dirname, ppa);
 
 _over:
 
@@ -439,7 +439,7 @@ fara_node *fara_haml_parse_f(const char *path, ...)
 
     flu_list_set(rd, "content", r);
 
-    char *ldir = find_layouts_dir(pa);
+    char *ldir = find_dir("layouts", pa);
       //
     if (ldir == NULL) goto _over;
       //
