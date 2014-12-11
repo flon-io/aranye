@@ -413,6 +413,10 @@ char *flu_dirname(const char *path, ...)
   char *s = flu_svprintf(path, ap);
   va_end(ap);
 
+  size_t l = strlen(s) - 1;
+
+  if (s[l] == '/') { s[l] = 0; return s; }
+
   char *dn = dirname(s);
   char *ddn = strdup(dn);
   free(s);
