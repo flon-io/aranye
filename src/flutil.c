@@ -351,7 +351,7 @@ static char *flu_simplify_path(const char *s)
     {
       *(rr - 1) = 0;
       rr = strrchr(r, '/');
-      rr = rr ? rr + 1 : r + 1;
+      rr = rr ? rr + 1 : r;
     }
     else if (dots < 1)
     {
@@ -413,9 +413,9 @@ char *flu_dirname(const char *path, ...)
   char *s = flu_svprintf(path, ap);
   va_end(ap);
 
-  size_t l = strlen(s) - 1;
+  size_t l = strlen(s);
 
-  if (s[l] == '/') { s[l] = 0; return s; }
+  if (l > 0 && s[l - 1] == '/') { s[l - 1] = 0; return s; }
 
   char *dn = dirname(s);
   char *ddn = strdup(dn);
