@@ -59,10 +59,12 @@ int main(int argc, char *argv[])
   free(dir);
 
   char *s = fara_node_to_html(n, 1);
-  r = flu_writeall(out, fara_node_to_html(n, 1));
+  r = flu_writeall(out, s);
   free(s);
 
   if (r != 1) { perror("failed to write target file"); return 1; }
+
+  fara_node_free(n);
 
   return 0; // success
 }

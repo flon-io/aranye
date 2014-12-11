@@ -385,15 +385,14 @@ static char *find_layouts_dir(const char *start_path)
   char *r = NULL;
 
   char *pa = flu_dirname(start_path);
-  char *pal = NULL;
+
+  char *pal = flu_path("%s/layouts", pa);
   char *ppa = NULL;
+
+  if (flu_fstat(pal) == 'd') { r = pal; goto _over; }
 
   if (strlen(pa) < 1) goto _over;
   if (strcmp(pa, ".") == 0) goto _over;
-
-  pal = flu_path("%s/layouts", pa);
-
-  if (flu_fstat(pal) == 'd') { r = pal; goto _over; }
 
   ppa = flu_path("%s/..", pa);
 
