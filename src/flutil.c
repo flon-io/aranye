@@ -818,13 +818,19 @@ char *flu_list_to_sp(flu_list *l) { return list_to_s(l, 'p'); }
 
 void flu_list_set(flu_list *l, const char *key, void *item)
 {
-  //flu_list_unshift(l, item); l->first->key = strdup(key);
-  flu_list_setk(l, strdup(key), item);
+  flu_list_setk(l, strdup(key), item, 0);
 }
 
-void flu_list_setk(flu_list *l, char *key, void *item)
+void flu_list_setk(flu_list *l, char *key, void *item, int set_as_last)
 {
-  flu_list_unshift(l, item); l->first->key = key;
+  if (set_as_last)
+  {
+    flu_list_add(l, item); l->last->key = key;
+  }
+  else
+  {
+    flu_list_unshift(l, item); l->first->key = key;
+  }
 }
 
 void flu_list_set_last(flu_list *l, const char *key, void *item)
@@ -901,7 +907,7 @@ flu_list *flu_vsd(va_list ap)
     char *vf = va_arg(ap, char *);
     char *v = vf ? flu_svprintf(vf, ap) : NULL;
 
-    flu_list_setk(d, k, v);
+    flu_list_setk(d, k, v, 0);
   }
 
   return d;
@@ -920,7 +926,7 @@ flu_list *flu_sd(char *kf0, ...)
 
   va_end(ap);
 
-  flu_list_setk(d, k0, v0);
+  flu_list_setk(d, k0, v0, 0);
 
   return d;
 }
