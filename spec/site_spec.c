@@ -70,6 +70,42 @@ context "site:"
     }
 
     it "includes"
+    {
+      n = fara_haml_parse_f("../spec/site/layinc.haml", NULL, NULL);
+
+      flu_putf(fara_node_to_st(n, 1));
+
+      //expect(fara_node_to_html(n, 1) ===f ""
+      //  "<!DOCTYPE html>\n"
+      //  "<html>\n"
+      //  "  <head>\n"
+      //  "    <title>\n"
+      //  "layout and include\n"
+      //  "    </title>\n"
+      //  "  </head>\n"
+      //  "  <body>\n"
+      //  "    <div class=\"header\">\n"
+      //  "      header\n"
+      //  "    </div>\n"
+      //  "    <h1>\n"
+      //  "layout and include\n"
+      //  "    </h1>\n"
+      //  "    <p>\n"
+      //  "  We pride in our quality products.\n"
+      //  "    </p>\n"
+      //  "    <div class=\"advertisement\">\n"
+      //  "      <hr></hr>\n"
+      //  "      <hr></hr>\n"
+      //  "    </div>\n"
+      //  "    <p>\n"
+      //  "  We don't care about typos though.\n"
+      //  "    </p>\n"
+      //  "    <div class=\"footer\">\n"
+      //  "      footer\n"
+      //  "    </div>\n"
+      //  "  </body>\n"
+      //  "</html>\n");
+    }
   }
 }
 

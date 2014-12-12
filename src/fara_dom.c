@@ -77,7 +77,7 @@ fara_node *fara_t(const char *text, ...)
 
 int fara_node_is_tag(fara_node *n) { return (n->t && n->atts); }
 int fara_node_is_text(fara_node *n) { return (n->t && n->atts == NULL); }
-int fara_node_is_doc(fara_node *n) { return (n->t == NULL && n->atts == NULL); }
+int fara_node_is_doc(fara_node *n) { return (n->t == NULL && n->atts != NULL); }
 
 void fara_node_render(flu_sbuffer *b, fara_node *n, int colour, ssize_t depth)
 {
@@ -232,5 +232,14 @@ void fara_node_add_class(fara_node *n, const char *cla)
   else c1 = strdup(cla);
 
   flu_list_set(n->atts, "class", c1);
+}
+
+void *fara_doc_lookup(fara_node *n, const char *key)
+{
+  if (n == NULL) return NULL;
+
+  void *v = fara_node_is_doc(n) ? flu_list_get(n->atts, key) : NULL;
+
+  return v ? v : fara_doc_lookup(n->parent, key);
 }
 

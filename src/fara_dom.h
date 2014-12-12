@@ -66,5 +66,10 @@ char *fara_node_to_html(fara_node *n, int flags);
 
 void fara_node_add_class(fara_node *n, const char *cla);
 
+/* Looks up for a value. Starts at node n and goes towards the root.
+ * Doesn't look at node attributes, only looks at doc attributes.
+ */
+void *fara_doc_lookup(fara_node *n, const char *key);
+
 #endif // FLON_FARA_DOM_H
 
