@@ -178,7 +178,7 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
 {
   int fi = flags & FARA_F_INDENT;
 
-  if (n->atts == NULL && n->children == NULL)
+  if (n->t != NULL && n->children == NULL)
   {
     flu_sbputs(b, n->t);
     if (fi) flu_sbputc(b, '\n');

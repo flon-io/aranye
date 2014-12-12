@@ -361,7 +361,11 @@ static void *default_include_callback(
   else
   {
     char *ss = flu_readall(fpath);
-    if (ss) r = fara_t(ss);
+    if (ss)
+    {
+      r = fara_text(ss);
+      if (strcmp(suff, ".html") == 0) r->atts = flu_sd("html", "true", NULL);
+    }
   }
 
   free(fpath);
