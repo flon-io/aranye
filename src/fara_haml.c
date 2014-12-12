@@ -288,7 +288,8 @@ static void *default_header_callback(const char *s, fara_node *n, void *data)
   return NULL;
 }
 
-static char *find_dir(const char *dirname, const char *start_path)
+static char *find_dir(
+  const char *start_path, const char *dirname)
 {
   char *r = NULL;
 
@@ -304,20 +305,43 @@ static char *find_dir(const char *dirname, const char *start_path)
 
   ppa = flu_path("%s/..", pa);
 
-  r = find_dir(dirname, ppa);
+  r = find_dir(ppa, dirname);
 
 _over:
 
   free(pa);
-  if (pal != r) free(pal);
+  if (r != pal) free(pal);
   free(ppa);
 
   return r;
 }
 
+static char *find_file(
+  const char *start_path, const char *dirname, const char *fname)
+{
+  char *dir = find_dir(start_path, dirname);
+  if (dir == NULL) return NULL;
+
+  char *fn = NULL;
+
+  fn = flu_path("%s/%s.haml", dir, fname);
+  if (flu_fstat(fn) == 'f') goto _over;
+
+  free(fn); fn = flu_path("%s/%s.html", dir, fname);
+  if (flu_fstat(fn) == 'f') goto _over;
+
+  free(fn); fn = NULL;
+
+_over:
+
+  free(dir);
+
+  return fn;
+}
+
 static void *default_include_callback(const char *s, fara_node *n, void *data)
 {
-  char *incd = find_dir("includes", fara_doc_lookup(n, "path"));
+  char *incd = find_dir(fara_doc_lookup(n, "path"), "includes");
 printf("path: >%s<\n", fara_doc_lookup(n, "path"));
 printf("incd: >%s<\n", incd);
 
@@ -465,12 +489,14 @@ fara_node *fara_haml_parse_f(const char *path, ...)
 
     flu_list_set(rd, "content", r);
 
-    char *ldir = find_dir("layouts", pa);
-    if (ldir == NULL) goto _over;
+    char *lfile = find_file(pa, "layouts", layout);
+    if (lfile == NULL) goto _over;
 
-    r = fara_haml_parse_f("%s/%s.haml", ldir, layout, rd, callbacks, data);
+    //r = fara_haml_parse_f("%s/%s.haml", ldir, layout, rd, callbacks, data);
+    r = fara_haml_parse_f(lfile, rd, callbacks, data);
 
-    free(ldir);
+    //free(ldir);
+    free(lfile);
 
     for (flu_node *fn = r->atts->first; fn; fn = fn->next)
     {
