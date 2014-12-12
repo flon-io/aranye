@@ -236,6 +236,7 @@ void fara_node_add_class(fara_node *n, const char *cla)
 
 void *fara_doc_lookup(fara_node *n, const char *key)
 {
+  //printf("fdl() k: >%s<, n: %s\n", key, fara_node_to_s(n));
   if (n == NULL) return NULL;
 
   void *v = fara_node_is_doc(n) ? flu_list_get(n->atts, key) : NULL;

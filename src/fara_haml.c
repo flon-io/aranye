@@ -163,7 +163,8 @@ static fara_node *push_to_parent(
   return newn;
 }
 
-static void eval_and_push(flu_dict *callbacks, fara_node *n, const char *ev)
+static void eval_and_push(
+  const char *ev, fara_node *n, flu_dict *callbacks, void *data)
 {
   char *code = flu_strtrim(ev);
 
@@ -172,7 +173,7 @@ static void eval_and_push(flu_dict *callbacks, fara_node *n, const char *ev)
       callbacks,
       strncmp(code, "include ", 8) == 0 ? "include" : "eval");
 
-  fara_node *res = cb(code, n, NULL);
+  fara_node *res = cb(code, n, callbacks, data);
 
   if (res)
   {
@@ -230,7 +231,7 @@ static fara_node *stack_ell(
   char *ev = fabr_lookup_string(s, t, "ev");
   if (ev)
   {
-    eval_and_push(cbs, nn, ev);
+    eval_and_push(ev, nn, cbs, data);
     free(ev);
   }
 
@@ -240,10 +241,10 @@ static fara_node *stack_ell(
 }
 
 static fara_node *stack_evl(
-  fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
+  fara_node *n, const char *s, flu_dict *callbacks, void *data, fabr_tree *t)
 {
   char *ev = fabr_lookup_string(s, t, "ev");
-  eval_and_push(cbs, n, ev);
+  eval_and_push(ev, n, callbacks, data);
   free(ev);
 
   return n;
@@ -266,7 +267,8 @@ static fara_node *stack(
   return n;
 }
 
-static void *default_header_callback(const char *s, fara_node *n, void *data)
+static void *default_header_callback(
+  const char *s, fara_node *n, flu_dict *callbacks, void *data)
 {
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
@@ -339,16 +341,36 @@ _over:
   return fn;
 }
 
-static void *default_include_callback(const char *s, fara_node *n, void *data)
+static void *default_include_callback(
+  const char *s, fara_node *n, flu_dict *callbacks, void *data)
 {
-  char *incd = find_dir(fara_doc_lookup(n, "path"), "includes");
-printf("path: >%s<\n", fara_doc_lookup(n, "path"));
-printf("incd: >%s<\n", incd);
+  fara_node *r = NULL;
 
-  return fara_t(s);
+  char *fn = strchr(s, ' '); if (fn) fn = fn + 1;
+
+  char *fpath = find_file(fara_doc_lookup(n, "path"), "includes", fn);
+
+  if (fpath == NULL) return NULL;
+
+  char *suff = strrchr(fpath, '.');
+
+  if (strcmp(suff, ".haml") == 0)
+  {
+    r = fara_haml_parse_f(fpath, NULL, callbacks, data);
+  }
+  else
+  {
+    char *ss = flu_readall(fpath);
+    if (ss) r = fara_t(ss);
+  }
+
+  free(fpath);
+
+  return r;
 }
 
-static void *default_eval_callback(const char *s, fara_node *n, void *data)
+static void *default_eval_callback(
+  const char *s, fara_node *n, flu_dict *callbacks, void *data)
 {
   void *v = fara_doc_lookup(n, s);
 
@@ -392,11 +414,7 @@ fara_node *fara_haml_parse(
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
   r->data = (void *)-1; // ;-)
 
-  if (rootd)
-  {
-    r->atts = flu_list_malloc();
-    flu_list_concat(r->atts, rootd);
-  }
+  r->atts = rootd;
 
   // headers
 
@@ -405,7 +423,7 @@ fara_node *fara_haml_parse(
   if (hes)
   {
     fara_haml_callback *hcb = flu_list_get(callbacks, "header");
-    hcb(hes, r, NULL);
+    hcb(hes, r, callbacks, data);
     free(hes);
   }
 
@@ -455,6 +473,7 @@ fara_node *fara_haml_parse_f(const char *path, ...)
   va_end(ap);
 
   flu_dict *rd = rootd ? rootd : flu_list_malloc();
+  flu_list_set(rd, "path", pa);
 
   fara_node *r = NULL;
 
@@ -462,7 +481,6 @@ fara_node *fara_haml_parse_f(const char *path, ...)
   if (s == NULL) goto _over;
 
   r = fara_haml_parse(s, rd, callbacks, data);
-  flu_list_set(r->atts, "path", pa);
 
   free(s);
 
@@ -471,6 +489,7 @@ fara_node *fara_haml_parse_f(const char *path, ...)
   char *layout = r->atts ? flu_list_get(r->atts, "layout") : NULL;
   if (layout)
   {
+    flu_dict *lrootd = flu_list_malloc();
     flu_dict *new_atts = flu_list_malloc();
     //
     for (flu_node *fn = r->atts->first; fn; fn = fn->next)
@@ -481,24 +500,22 @@ fara_node *fara_haml_parse_f(const char *path, ...)
           strcmp(fn->key, "layout") == 0
         ) ?
         new_atts :
-        rd;
+        lrootd;
       flu_list_set(d, fn->key, fn->item);
     }
     //
     flu_list_free(r->atts); r->atts = new_atts;
 
-    flu_list_set(rd, "content", r);
+    flu_list_set(lrootd, "content", r);
 
     char *lfile = find_file(pa, "layouts", layout);
     if (lfile == NULL) goto _over;
 
-    //r = fara_haml_parse_f("%s/%s.haml", ldir, layout, rd, callbacks, data);
-    r = fara_haml_parse_f(lfile, rd, callbacks, data);
+    r = fara_haml_parse_f(lfile, lrootd, callbacks, data);
 
-    //free(ldir);
     free(lfile);
 
-    for (flu_node *fn = r->atts->first; fn; fn = fn->next)
+    for (flu_node *fn = lrootd->first; fn; fn = fn->next)
     {
       if (strcmp(fn->key, "content") == 0) { fn->item = NULL; break; }
     }
@@ -507,7 +524,7 @@ fara_node *fara_haml_parse_f(const char *path, ...)
 _over:
 
   //free(pa);
-  if (rootd == NULL) flu_list_free(rd);
+  //if (rootd == NULL) flu_list_free(rd);
 
   //flu_putf(fara_node_to_st(r, 1));
 

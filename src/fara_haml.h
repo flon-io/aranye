@@ -31,7 +31,8 @@
 #include "fara_dom.h"
 
 
-typedef void *fara_haml_callback(const char *s, fara_node *n, void *data);
+typedef void *fara_haml_callback(
+  const char *s, fara_node *n, flu_dict *callbacks, void *data);
 
 /* Interprets the given HAML and returns the fara_node corresponding to it.
  */
