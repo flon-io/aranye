@@ -40,6 +40,3 @@ clean:
 
 fara: $(NAMES)
 
-bin: fara
-	cp fara ../bin/
-
