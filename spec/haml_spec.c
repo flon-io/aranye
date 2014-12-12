@@ -45,20 +45,20 @@ context "haml:"
     it "accepts attributes with quotes"
     {
       n = fara_haml_parse_s(
-        ".x{ y: 'z' }");
+        ".x{ y: 'z', a: 'b c' }");
 
       expect(fara_node_to_html(n, 1) ===f ""
-        "<div class=\"x\" y=\"z\">\n"
+        "<div class=\"x\" y=\"z\" a=\"b c\">\n"
         "</div>\n");
     }
 
     it "accepts attributes with double-quotes"
     {
       n = fara_haml_parse_s(
-        ".x{ y: \"z\" }");
+        ".x{ y: \"z\", a: \"b c\" }");
 
       expect(fara_node_to_html(n, 1) ===f ""
-        "<div class=\"x\" y=\"z\">\n"
+        "<div class=\"x\" y=\"z\" a=\"b c\">\n"
         "</div>\n");
     }
 

@@ -48,12 +48,12 @@ void haml_parser_init()
       fabr_alt(
         fabr_seq(
           fabr_string("\""),
-          fabr_n_rex("v", "[^\" \t\r\n,]+"),
+          fabr_n_rex("v", "[^\"\r\n,]+"),
           fabr_string("\""),
           NULL),
         fabr_seq(
           fabr_string("'"),
-          fabr_n_rex("v", "[^' \t\r\n,]+"),
+          fabr_n_rex("v", "[^'\r\n,]+"),
           fabr_string("'"),
           NULL),
         fabr_n_rex("v", "[^ \t\r\n,]+"),
@@ -213,7 +213,8 @@ static fara_node *stack_ell(
     flu_list_setk(
       nn->atts,
       fabr_lookup_string(s, en->item, "k"),
-      fabr_lookup_string(s, en->item, "v"));
+      fabr_lookup_string(s, en->item, "v"),
+      1);
   }
   flu_list_free(ents);
 
@@ -293,7 +294,8 @@ static void *default_header_callback(
     flu_list_setk(
       n->atts,
       fabr_lookup_string(s, en->item, "k"),
-      fabr_lookup_string(s, en->item, "v"));
+      fabr_lookup_string(s, en->item, "v"),
+      0);
   }
   flu_list_free(es);
 
