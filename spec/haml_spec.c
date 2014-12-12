@@ -42,6 +42,26 @@ context "haml:"
         "</div>\n");
     }
 
+    it "accepts attributes with quotes"
+    {
+      n = fara_haml_parse_s(
+        ".x{ y: 'z' }");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"x\" y=\"z\">\n"
+        "</div>\n");
+    }
+
+    it "accepts attributes with double-quotes"
+    {
+      n = fara_haml_parse_s(
+        ".x{ y: \"z\" }");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"x\" y=\"z\">\n"
+        "</div>\n");
+    }
+
     it "parses a haml line .ca.cb"
     {
       n = fara_haml_parse_s(

@@ -45,7 +45,19 @@ void haml_parser_init()
       "jsentry",
       fabr_n_rex("k", "[^ \t\r\n:]+"),
       fabr_rex("[ \t]*:[ \t]*"),
-      fabr_n_rex("v", "[^ \t\r\n,]+"),
+      fabr_alt(
+        fabr_seq(
+          fabr_string("\""),
+          fabr_n_rex("v", "[^\" \t\r\n,]+"),
+          fabr_string("\""),
+          NULL),
+        fabr_seq(
+          fabr_string("'"),
+          fabr_n_rex("v", "[^' \t\r\n,]+"),
+          fabr_string("'"),
+          NULL),
+        fabr_n_rex("v", "[^ \t\r\n,]+"),
+        NULL),
       NULL);
   fabr_parser *jsatts =
     fabr_n_seq(
