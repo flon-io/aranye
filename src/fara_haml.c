@@ -527,11 +527,13 @@ fara_node *fara_haml_parse_f(const char *path, ...)
 
 _over:
 
-  //free(pa);
-  //if (rootd == NULL) flu_list_free(rd);
-
   //flu_putf(fara_node_to_st(r, 1));
 
-  return r;
+  if (r) return r; // success
+
+  if (rd != rootd) flu_list_free(rd);
+  free(pa);
+
+  return NULL;
 }
 

@@ -153,6 +153,13 @@ context "site:"
         "  </body>\n"
         "</html>\n");
     }
+
+    it "frees resources upon failure"
+    {
+      n = fara_haml_parse_f("nada.haml", NULL, NULL);
+
+      expect(n == NULL);
+    }
   }
 }
 
