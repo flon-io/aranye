@@ -22,7 +22,7 @@ context "haml:"
 
   describe "fara_haml_parse_s()"
   {
-    it "parses a haml line %h1"
+    it "parses %h1"
     {
       n = fara_haml_parse_s(
         "%h1");
@@ -30,6 +30,16 @@ context "haml:"
       expect(fara_node_to_html(n, 1) ===f ""
         "<h1>\n"
         "</h1>\n");
+    }
+
+    it "parses a haml line %body.site-layout"
+    {
+      n = fara_haml_parse_s(
+        "%body.site-layout");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<body class=\"site-layout\">\n"
+        "</body>\n");
     }
 
     it "parses a haml line #id.class{ x: y }"

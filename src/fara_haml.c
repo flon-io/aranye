@@ -75,9 +75,9 @@ void haml_parser_init()
   fabr_parser *tic =
     fabr_n_alt(
       "tic",
-      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z-_0-9]+"), NULL),
-      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z-_0-9]+"), NULL),
-      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z-_0-9]+"), NULL),
+      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z\\-_0-9]+"), NULL),
+      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z\\-_0-9]+"), NULL),
+      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z\\-_0-9]+"), NULL),
       NULL);
 
   fabr_parser *ind =
@@ -420,14 +420,14 @@ fara_node *fara_haml_parse(
   //puts("[1;30m"); puts(fabr_parser_to_string(haml_parser)); puts("[0;0m");
   //fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
 
-  //printf(">[0;33m%s[0;0m<\n", s);
+  printf(">[0;33m%s[0;0m<\n", s);
 
   //fabr_tree *tt = fabr_parse_f(s, 0, haml_parser, 0);
   //flu_putf(fabr_tree_to_string(tt, s, 1));
   //fabr_tree_free(tt);
 
   fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
-  //flu_putf(fabr_tree_to_string(t, s, 1));
+  flu_putf(fabr_tree_to_string(t, s, 1));
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
   r->data = (void *)-1; // ;-)
