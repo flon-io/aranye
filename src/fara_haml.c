@@ -48,12 +48,12 @@ void haml_parser_init()
       fabr_alt(
         fabr_seq(
           fabr_string("\""),
-          fabr_n_rex("v", "[^\"\r\n,]+"),
+          fabr_n_rex("v", "[^\"\r\n,]*"),
           fabr_string("\""),
           NULL),
         fabr_seq(
           fabr_string("'"),
-          fabr_n_rex("v", "[^'\r\n,]+"),
+          fabr_n_rex("v", "[^'\r\n,]*"),
           fabr_string("'"),
           NULL),
         fabr_n_rex("v", "[^ \t\r\n,]+"),
