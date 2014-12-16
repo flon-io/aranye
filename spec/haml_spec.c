@@ -32,7 +32,7 @@ context "haml:"
         "</h1>\n");
     }
 
-    it "parses a haml line %body.site-layout"
+    it "parses %body.site-layout"
     {
       n = fara_haml_parse_s(
         "%body.site-layout");
@@ -42,13 +42,33 @@ context "haml:"
         "</body>\n");
     }
 
-    it "parses a haml line #id.class{ x: y }"
+    it "parses #id.class{ x: y }"
     {
       n = fara_haml_parse_s(
         "#id.class{ x: y }");
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div id=\"id\" class=\"class\" x=\"y\">\n"
+        "</div>\n");
+    }
+
+    it "parses .x{ y: \"\" }"
+    {
+      n = fara_haml_parse_s(
+        ".x{ y: \"\" }");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"x\" y=\"\">\n"
+        "</div>\n");
+    }
+
+    it "parses .ca.cb"
+    {
+      n = fara_haml_parse_s(
+        ".ca.cb");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"ca cb\">\n"
         "</div>\n");
     }
 
@@ -69,16 +89,6 @@ context "haml:"
 
       expect(fara_node_to_html(n, 1) ===f ""
         "<div class=\"x\" y=\"z\" a=\"b c\">\n"
-        "</div>\n");
-    }
-
-    it "parses a haml line .ca.cb"
-    {
-      n = fara_haml_parse_s(
-        ".ca.cb");
-
-      expect(fara_node_to_html(n, 1) ===f ""
-        "<div class=\"ca cb\">\n"
         "</div>\n");
     }
 
