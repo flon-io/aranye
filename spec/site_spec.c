@@ -69,6 +69,36 @@ context "site:"
         "</html>\n");
     }
 
+    it "extrapolates a layout (2)"
+    {
+      n = fara_haml_parse_f("../spec/site/%s", "index2.haml", NULL, NULL);
+
+      //flu_putf(fara_node_to_st(n, 1));
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<!DOCTYPE html>\n"
+        "<html>\n"
+        "  <head>\n"
+        "    <title>\n"
+        "de rerum natura\n"
+        "    </title>\n"
+        "  </head>\n"
+        "  <body>\n"
+        "    <div class=\"sidebar\">\n"
+        "      side\n"
+        "    </div>\n"
+        "    <div class=\"content\">\n"
+        "      <p>\n"
+        "  Christmas\n"
+        "      </p>\n"
+        "      <p>\n"
+        "  New Year\n"
+        "      </p>\n"
+        "    </div>\n"
+        "  </body>\n"
+        "</html>\n");
+    }
+
     it "includes"
     {
       n = fara_haml_parse_f("../spec/site/layinc.haml", NULL, NULL);

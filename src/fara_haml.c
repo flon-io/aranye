@@ -190,6 +190,7 @@ static void eval_and_push(
   if (res)
   {
     if (fara_node_is_text(res)) fara_node_push(n, res);
+    else if (fara_node_is_empty(n)) fara_node_push(n, res);
     else fara_node_push(n->parent, res);
   }
 
