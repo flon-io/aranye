@@ -113,9 +113,9 @@ void fara_node_render(flu_sbuffer *b, fara_node *n, int colour, ssize_t depth)
   char *caon = colour ? "[0;34m" : "";
   char *coff = colour ? "[0;0m" : "";
 
-  char *t = n->t ? strndup(n->t, 24) : NULL;
-  if (t && strlen(t) > 20) strcpy(t + 21, "...\0");
+  char *t = n->t ? strndup(n->t, 25) : NULL;
   ssize_t ts = n->t ? strlen(n->t) : -1;
+  if (ts > 25) strcpy(t + 20, "...\0");
 
   flu_sbprintf(
     b,

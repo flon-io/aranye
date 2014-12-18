@@ -184,6 +184,13 @@ context "site:"
         "</html>\n");
     }
 
+    it "includes a script after a script (gh-2)"
+    {
+      n = fara_haml_parse_f("../spec/site/incscri.haml", NULL, NULL);
+
+      flu_putf(fara_node_to_st(n, 1));
+    }
+
     it "frees resources upon failure"
     {
       n = fara_haml_parse_f("nada.haml", NULL, NULL);
