@@ -188,7 +188,35 @@ context "site:"
     {
       n = fara_haml_parse_f("../spec/site/incscri.haml", NULL, NULL);
 
-      flu_putf(fara_node_to_st(n, 1));
+      //flu_putf(fara_node_to_st(n, 1));
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<!DOCTYPE html>\n"
+        "<html>\n"
+        "  <head>\n"
+        "    <title>\n"
+        "include and script and script\n"
+        "    </title>\n"
+        "  </head>\n"
+        "  <body>\n"
+        "    <div class=\"sidebar\">\n"
+        "      side\n"
+        "    </div>\n"
+        "    <div class=\"content\">\n"
+        "      <p>\n"
+        "  It's like this.\n"
+        "      </p>\n"
+        "      <p>\n"
+        "  Or it's like that.\n"
+        "      </p>\n"
+        "    </div>\n"
+        "    <script src=\"js/code.js\">\n"
+        "    </script>\n"
+        "    <script>\n"
+        "  console.log('hello');\n"
+        "    </script>\n"
+        "  </body>\n"
+        "</html>\n");
     }
 
     it "frees resources upon failure"

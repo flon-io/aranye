@@ -176,7 +176,7 @@ static fara_node *push_to_parent(
 }
 
 static void eval_and_push(
-  const char *ev, fara_node *n, flu_dict *callbacks, void *data)
+  fabr_tree *t, const char *ev, fara_node *n, flu_dict *callbacks, void *data)
 {
   char *code = flu_strtrim(ev);
 
@@ -189,9 +189,8 @@ static void eval_and_push(
 
   if (res)
   {
-    if (fara_node_is_text(res)) fara_node_push(n, res);
-    else if (fara_node_is_empty(n)) fara_node_push(n, res);
-    else fara_node_push(n->parent, res);
+    if (t == NULL) fara_node_push(n, res);
+    else push_to_parent(n, t, res);
   }
 
   free(code);
@@ -245,7 +244,7 @@ static fara_node *stack_ell(
   char *ev = fabr_lookup_string(s, t, "ev");
   if (ev)
   {
-    eval_and_push(ev, nn, cbs, data);
+    eval_and_push(NULL, ev, nn, cbs, data);
     free(ev);
   }
 
@@ -258,7 +257,7 @@ static fara_node *stack_evl(
   fara_node *n, const char *s, flu_dict *callbacks, void *data, fabr_tree *t)
 {
   char *ev = fabr_lookup_string(s, t, "ev");
-  eval_and_push(ev, n, callbacks, data);
+  eval_and_push(t, ev, n, callbacks, data);
   free(ev);
 
   return n;
