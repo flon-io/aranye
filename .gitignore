@@ -3,9 +3,11 @@ tmp/*.h
 tmp/*.c
 tmp/*.o
 tmp/*.so
+tmp/*.css
 tmp/s
 tmp/spec_*.txt
 tmp/fara
+tmp/fara-svar
 bin/*
 
 !.gitkeep

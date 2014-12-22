@@ -10,8 +10,12 @@ ifeq ($(RODZO),)
   RODZO=../../rodzo/bin/rodzo
 endif
 
-NAMES=flutil.o aabro.o fara_dom.o fara_haml.o
+NAMES=flutil.o aabro.o fara_dom.o fara_haml.o fara_svar.o
 
+fara-svar: $(NAMES)
+
+bin/fara-svar: fara-svar
+	cp fara-svar ../bin/
 
 s.c: ../spec/*_spec.c
 	$(RODZO) ../spec -o s.c
