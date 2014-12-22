@@ -31,7 +31,7 @@
 #include "flutil.h"
 
 
-char *fara_extrapolate(char *line, flu_dict *vars);
+char *fara_extrapolate(const char *line, flu_dict *vars);
 
 #endif // FLON_FARA_SVAR_H
 

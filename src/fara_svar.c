@@ -41,7 +41,7 @@ static void init_parser()
   fabr_parser *literal =
     fabr_n_rex("l", "[^\\$;\n\r]+");
   fabr_parser *reference =
-    fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]");
+    fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]+");
   fabr_parser *semi =
     fabr_n_rex("s", "[;\n\r]+");
 
@@ -94,15 +94,23 @@ char *extrapolate(char *line, fabr_tree *t, flu_dict *vars, int isval)
     //flu_putf(fabr_tree_to_string(tt, line, 1));
 
     if (*tt->name == 'l' || (*tt->name == 's' && isval == 0))
+    {
       flu_sbputs_n(b, line + tt->offset, tt->length);
-    //else // 'r'
-      // TODO
+    }
+    else if (*tt->name == 'r')
+    {
+      char *k = fabr_tree_string(line, tt);
+      char *v = flu_list_get(vars, k);
+      if (v) flu_sbputs(b, v);
+      free(k);
+    }
   }
+  flu_list_free(l);
 
   return flu_sbuffer_to_string(b);
 }
 
-char *fara_extrapolate(char *line, flu_dict *vars)
+char *fara_extrapolate(const char *line, flu_dict *vars)
 {
   if (parser == NULL) init_parser();
 
@@ -114,6 +122,10 @@ char *fara_extrapolate(char *line, flu_dict *vars)
 
   //flu_putf(fabr_tree_to_string(t, line, 1));
 
-  return extrapolate(line, t, vars, 0);
+  char *r = extrapolate(line, t, vars, 0);
+
+  fabr_tree_free(t);
+
+  return r;
 }
 

@@ -25,11 +25,19 @@ context "svar:"
   {
     it "understands variable definitions"
     {
-      r = fara_extrapolate(rdz_strdup("$alpha: bravo;\n"), vars);
+      r = fara_extrapolate("$alpha: bravo;\n", vars);
 
       expect(r === "//$alpha: bravo;\n");
       expect(vars->size i== 1);
       expect(flu_list_get(vars, "$alpha") === "bravo");
+    }
+
+    it "extrapolates vars"
+    {
+      r = fara_extrapolate("$color: white;\n", vars); free(r);
+      r = fara_extrapolate("color: $color;\n", vars);
+
+      expect(r === "color: white;\n");
     }
   }
 }
