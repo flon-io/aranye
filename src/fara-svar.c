@@ -37,17 +37,17 @@
 static void print_usage()
 {
   fprintf(stderr, "\n");
-  fprintf(stderr, "fara-svar {source css}\n");
+  fprintf(stderr, "fara-svar {source css}+\n");
   fprintf(stderr, "\n");
 }
 
-int main(int argc, char *argv[])
+static int process(const char *path)
 {
-  if (argc != 2) { print_usage(); return 1; }
+  printf("\n// %s\n\n", path);
 
   flu_dict *vars = flu_list_malloc();
 
-  FILE *f = fopen(argv[1], "r");
+  FILE *f = fopen(path, "r");
   if (f == NULL) goto _over;
 
   char *line = NULL;
@@ -69,8 +69,28 @@ _over:
 
   flu_list_free_all(vars);
 
-  if (errno) perror("error...");
+  if (errno)
+  {
+    char *s = flu_sprintf("error processing %s", path);
+    perror(s);
+    free(s);
+  }
 
   return errno;
+}
+
+int main(int argc, char *argv[])
+{
+  if (argc < 2) { print_usage(); return 1; }
+
+  int r = 0;
+
+  for (int i = 1; i < argc; ++i)
+  {
+    int rr = process(argv[i]);
+    if (r == 0) r = rr;
+  }
+
+  return r;
 }
 

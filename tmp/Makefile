@@ -34,6 +34,7 @@ clean:
 	rm -f s
 	rm -f fara
 	rm -f ../bin/fara
+	rm -f ../bin/fara-svar
 
 .PHONY: spec vspec dspec clean
 
