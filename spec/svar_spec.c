@@ -39,6 +39,24 @@ context "svar:"
 
       expect(r === "color: white;\n");
     }
+
+    it "extrapolates in var definitions"
+    {
+      r = fara_extrapolate("$ab: cd;\n", vars); free(r);
+      r = fara_extrapolate("$ef: gh-$ab;\n", vars);
+
+      expect(r === "//$ef: gh-cd;\n");
+      expect(vars->size i== 2);
+      expect(flu_list_get(vars, "$ab") === "cd");
+      expect(flu_list_get(vars, "$ef") === "gh-cd");
+    }
+
+    it "extrapolates unknown vars to \"\""
+    {
+      r = fara_extrapolate("x: $nada;\n", vars);
+
+      expect(r === "x: ;\n");
+    }
   }
 }
 
