@@ -29,30 +29,78 @@
 
 //#include <stdlib.h>
 
+#include "flutil.h"
 #include "aabro.h"
 #include "fara_svar.h"
 
 
 fabr_parser *parser = NULL;
 
-void init_parser()
+static void init_parser()
 {
+  fabr_parser *literal =
+    fabr_n_rex("l", "[^\\$;\n\r]+");
+  fabr_parser *reference =
+    fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]");
+  fabr_parser *semi =
+    fabr_n_rex("s", "[;\n\r]+");
+
+  fabr_parser *text =
+    fabr_rep(fabr_alt(reference, literal, semi, NULL), 1, -1);
+
   fabr_parser *definition =
     fabr_n_seq(
       "d",
       fabr_rex("[ \t]*"),
       fabr_n_rex("k", "\\$[a-zA-Z0-9_-]+"),
       fabr_rex("[ \t]*:[ \t]*"),
-      fabr_n_rex("v", "[^;\r\n]+"),
-      fabr_rex(".*"),
+      fabr_name("v", text),
       NULL);
 
-  fabr_parser *line =
-    fabr_n_rex("l", ".+");
-
-  parser = fabr_alt(definition, line, NULL);
+  parser = fabr_alt(definition, text, NULL);
 }
 
+static short lsr_filter(const fabr_tree *t)
+{
+  if (t->name == NULL) return 0;
+  if (*t->name == 'l' || *t->name == 's' || *t->name == 'r') return 1;
+  return 0;
+}
+
+char *extrapolate(char *line, fabr_tree *t, flu_dict *vars, int isval)
+{
+  //flu_putf(fabr_tree_to_string(t, line, 1));
+
+  fabr_tree *d = fabr_tree_lookup(t, "d");
+  if (d)
+  {
+    char *k = fabr_lookup_string(line, t, "k");
+    char *v0 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 0);
+    char *v1 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 1);
+    flu_list_setk(vars, k, v1, 0);
+
+    char *r = flu_sprintf("//%s: %s", k, v0);
+    free(v0);
+
+    return r;
+  }
+
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  flu_list *l = fabr_tree_list(t, lsr_filter);
+  for (flu_node *fn = l->first; fn; fn = fn->next)
+  {
+    fabr_tree *tt = fn->item;
+    //flu_putf(fabr_tree_to_string(tt, line, 1));
+
+    if (*tt->name == 'l' || (*tt->name == 's' && isval == 0))
+      flu_sbputs_n(b, line + tt->offset, tt->length);
+    //else // 'r'
+      // TODO
+  }
+
+  return flu_sbuffer_to_string(b);
+}
 
 char *fara_extrapolate(char *line, flu_dict *vars)
 {
@@ -64,20 +112,8 @@ char *fara_extrapolate(char *line, flu_dict *vars)
 
   fabr_tree *t = fabr_parse_all(line, 0, parser);
 
-  flu_putf(fabr_tree_to_string(t, line, 1));
+  //flu_putf(fabr_tree_to_string(t, line, 1));
 
-  fabr_tree *d = fabr_tree_lookup(t, "d");
-  if (d)
-  {
-    flu_list_setk(
-      vars,
-      fabr_lookup_string(line, d, "k"),
-      fabr_lookup_string(line, d, "v"),
-      0);
-
-    return flu_sprintf("//%s", line);
-  }
-
-  return NULL;
+  return extrapolate(line, t, vars, 0);
 }
 
