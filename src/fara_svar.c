@@ -27,7 +27,7 @@
 
 #define _POSIX_C_SOURCE 200809L
 
-//#include <stdlib.h>
+#include <stdlib.h>
 
 #include "flutil.h"
 #include "aabro.h"
@@ -67,7 +67,7 @@ static short lsr_filter(const fabr_tree *t)
   return 0;
 }
 
-char *extrapolate(char *line, fabr_tree *t, flu_dict *vars, int isval)
+char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars, int isval)
 {
   //flu_putf(fabr_tree_to_string(t, line, 1));
 

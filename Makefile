@@ -16,6 +16,7 @@ cs: clean spec
 
 .PHONY: spec clean upgrade cs
 
-bin: fara
+bin: fara fara-svar
 	cp tmp/fara bin/
+	cp tmp/fara-svar bin/
 

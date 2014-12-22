@@ -57,16 +57,9 @@ int main(int argc, char *argv[])
   {
     if (getline(&line, &n, f) == -1) break;
 
-    //char **kv = extract_kv(line);
-    //if (kv)
-    //{
-    //  flu_list_set(vars, k[0], k[1]);
-    //  printf("//%s", line);
-    //}
-    //else
-    //{
-    //  puts(extrapolate(line, vars));
-    //}
+    char *s = fara_extrapolate(line, vars);
+    printf(s);
+    free(s);
   }
   free(line);
 

@@ -12,11 +12,6 @@ endif
 
 NAMES=flutil.o aabro.o fara_dom.o fara_haml.o fara_svar.o
 
-fara-svar: $(NAMES)
-
-bin/fara-svar: fara-svar
-	cp fara-svar ../bin/
-
 s.c: ../spec/*_spec.c
 	$(RODZO) ../spec -o s.c
 
@@ -43,4 +38,5 @@ clean:
 .PHONY: spec vspec dspec clean
 
 fara: $(NAMES)
+fara-svar: $(NAMES)
 
