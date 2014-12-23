@@ -17,7 +17,6 @@ context "svar:"
   }
   after each
   {
-    free(r);
     flu_list_free_all(vars);
   }
 
@@ -37,7 +36,7 @@ context "svar:"
       r = fara_extrapolate("$color: white;\n", vars); free(r);
       r = fara_extrapolate("color: $color;\n", vars);
 
-      expect(r === "color: white;\n");
+      expect(r ===f "color: white;\n");
     }
 
     it "extrapolates in var definitions"
@@ -55,7 +54,7 @@ context "svar:"
     {
       r = fara_extrapolate("x: $nada;\n", vars);
 
-      expect(r === "x: ;\n");
+      expect(r ===f "x: ;\n");
     }
 
     it "removes // comments after definitions"
@@ -69,7 +68,7 @@ context "svar:"
     {
       r = fara_extrapolate("  color: blue; // blah blah\n", vars);
 
-      expect(r === "  color: blue;\n");
+      expect(r ===f "  color: blue;\n");
     }
 
     it "removes // comment lines"
@@ -78,6 +77,27 @@ context "svar:"
 
       expect(r == NULL);
     }
+
+    it "doesn't touch /* comments"
+    {
+      r = fara_extrapolate(
+        "  /* http://meyerweb.com/eric/tools/css/reset/\n", vars);
+
+      expect(r ===f ""
+        "  /* http://meyerweb.com/eric/tools/css/reset/\n");
+
+      r = fara_extrapolate(
+        "*/\n", vars);
+
+      expect(r ===f ""
+        "*/\n");
+    }
+
+    it "is ok with */EOL"
+    //{
+    //  r = fara_extrapolate("*/", vars);
+    //  expect(r ===f "*/\n");
+    //}
   }
 }
 
