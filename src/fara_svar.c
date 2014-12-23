@@ -28,6 +28,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "flutil.h"
 #include "aabro.h"
@@ -39,14 +40,23 @@ fabr_parser *parser = NULL;
 static void init_parser()
 {
   fabr_parser *literal =
-    fabr_n_rex("l", "[^\\$;\n\r]+");
+    fabr_n_rex("l", "[^\\$;\n\r/]+");
   fabr_parser *reference =
     fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]+");
   fabr_parser *semi =
-    fabr_n_rex("s", "[;\n\r]+");
+    fabr_n_rex("s", "[ \t]*;[ \t]*");
+
+  fabr_parser *eol =
+    fabr_seq(
+      fabr_rex("//[^\n\r]*"), fabr_q("?"),
+      fabr_n_rex("n", "[\n\r]+"),
+      NULL);
 
   fabr_parser *text =
-    fabr_rep(fabr_alt(reference, literal, semi, NULL), 1, -1);
+    fabr_seq(
+      fabr_alt(reference, literal, semi, NULL), fabr_q("+"),
+      eol,
+      NULL);
 
   fabr_parser *definition =
     fabr_n_seq(
@@ -75,14 +85,10 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars, int isval)
   if (d)
   {
     char *k = fabr_lookup_string(line, t, "k");
-    //char *v0 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 0);
-    char *v1 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 1);
-    flu_list_setk(vars, k, v1, 0);
+    char *v = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 1);
+    flu_list_setk(vars, k, v, 0);
 
-    char *r = flu_sprintf("/*%s: %s;*/\n", k, v1);
-    //free(v0);
-
-    return r;
+    return NULL;
   }
 
   flu_sbuffer *b = flu_sbuffer_malloc();
@@ -107,7 +113,25 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars, int isval)
   }
   flu_list_free(l);
 
+  if (isval == 0) flu_sbputc(b, '\n');
+
   return flu_sbuffer_to_string(b);
+}
+
+static char *trim(char *line)
+{
+  if (line == NULL) return NULL;
+
+  for (size_t i = strlen(line); ; --i)
+  {
+    char c = i > 0 ? line[i - 1] : 'x';
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') continue;
+    line[i] = '\n'; line[i + 1] = 0; break;
+  }
+
+  if (strcmp(line, "\n") == 0) { free(line); return NULL; }
+
+  return line;
 }
 
 char *fara_extrapolate(const char *line, flu_dict *vars)
@@ -126,6 +150,6 @@ char *fara_extrapolate(const char *line, flu_dict *vars)
 
   fabr_tree_free(t);
 
-  return r;
+  return trim(r);
 }
 

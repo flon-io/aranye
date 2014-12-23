@@ -58,7 +58,7 @@ static int process(const char *path)
     if (getline(&line, &n, f) == -1) break;
 
     char *s = fara_extrapolate(line, vars);
-    printf(s);
+    if (s) printf(s);
     free(s);
   }
   free(line);

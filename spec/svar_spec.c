@@ -27,7 +27,7 @@ context "svar:"
     {
       r = fara_extrapolate("$alpha: bravo;\n", vars);
 
-      expect(r === "/*$alpha: bravo;*/\n");
+      expect(r == NULL);
       expect(vars->size i== 1);
       expect(flu_list_get(vars, "$alpha") === "bravo");
     }
@@ -45,7 +45,7 @@ context "svar:"
       r = fara_extrapolate("$ab: cd;\n", vars); free(r);
       r = fara_extrapolate("$ef: gh-$ab;\n", vars);
 
-      expect(r === "/*$ef: gh-cd;*/\n");
+      expect(r == NULL);
       expect(vars->size i== 2);
       expect(flu_list_get(vars, "$ab") === "cd");
       expect(flu_list_get(vars, "$ef") === "gh-cd");
@@ -56,6 +56,27 @@ context "svar:"
       r = fara_extrapolate("x: $nada;\n", vars);
 
       expect(r === "x: ;\n");
+    }
+
+    it "removes // comments after definitions"
+    {
+      r = fara_extrapolate("$x: y z // blah blah\n", vars);
+
+      expect(r == NULL);
+    }
+
+    it "removes // comments after regular css"
+    {
+      r = fara_extrapolate("  color: blue; // blah blah\n", vars);
+
+      expect(r === "  color: blue;\n");
+    }
+
+    it "removes // comment lines"
+    {
+      r = fara_extrapolate(" // blah blah\n", vars);
+
+      expect(r == NULL);
     }
   }
 }
