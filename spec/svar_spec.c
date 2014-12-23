@@ -27,7 +27,7 @@ context "svar:"
     {
       r = fara_extrapolate("$alpha: bravo;\n", vars);
 
-      expect(r === "//$alpha: bravo;\n");
+      expect(r === "/*$alpha: bravo;*/\n");
       expect(vars->size i== 1);
       expect(flu_list_get(vars, "$alpha") === "bravo");
     }
@@ -45,7 +45,7 @@ context "svar:"
       r = fara_extrapolate("$ab: cd;\n", vars); free(r);
       r = fara_extrapolate("$ef: gh-$ab;\n", vars);
 
-      expect(r === "//$ef: gh-cd;\n");
+      expect(r === "/*$ef: gh-cd;*/\n");
       expect(vars->size i== 2);
       expect(flu_list_get(vars, "$ab") === "cd");
       expect(flu_list_get(vars, "$ef") === "gh-cd");

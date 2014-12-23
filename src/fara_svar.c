@@ -75,12 +75,12 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars, int isval)
   if (d)
   {
     char *k = fabr_lookup_string(line, t, "k");
-    char *v0 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 0);
+    //char *v0 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 0);
     char *v1 = extrapolate(line, fabr_tree_lookup(t, "v"), vars, 1);
     flu_list_setk(vars, k, v1, 0);
 
-    char *r = flu_sprintf("//%s: %s", k, v0);
-    free(v0);
+    char *r = flu_sprintf("/*%s: %s;*/\n", k, v1);
+    //free(v0);
 
     return r;
   }

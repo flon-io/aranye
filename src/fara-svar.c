@@ -43,7 +43,7 @@ static void print_usage()
 
 static int process(const char *path)
 {
-  printf("\n// %s\n\n", path);
+  printf("\n/* %s */\n\n", path);
 
   flu_dict *vars = flu_list_malloc();
 
