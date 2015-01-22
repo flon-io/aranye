@@ -267,7 +267,9 @@ static fara_node *stack_evl(
 static fara_node *stack_txl(
   fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
 {
-  return push_to_parent(n, t, fara_node_malloc(fabr_tree_string(s, t), NULL));
+  push_to_parent(n, t, fara_node_malloc(fabr_tree_string(s, t), NULL));
+
+  return n;
 }
 
 static fara_node *stack(

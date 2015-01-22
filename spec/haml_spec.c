@@ -185,6 +185,23 @@ context "haml:"
         "</div>\n");
     }
 
+    it "stacks text of different indentation"
+    {
+      n = fara_haml_parse_s(
+        "%script\n"
+        "  if (true) {\n"
+        "    console.log('flipping the burgers!');\n"
+        "  }\n"
+        "");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<script>\n"
+        "  if (true) {\n"
+        "    console.log('flipping the burgers!');\n"
+        "  }\n"
+        "</script>\n");
+    }
+
     it "leverages document headers"
     {
       n = fara_haml_parse_s(
