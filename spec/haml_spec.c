@@ -136,6 +136,24 @@ context "haml:"
         "</div>\n");
     }
 
+    it "finishes an element before going with the next text"
+    {
+      n = fara_haml_parse_s(
+        "#menu\n"
+        "  .stuff\n"
+        "    blah 0\n"
+        "  nada\n"
+        "");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div id=\"menu\">\n"
+        "  <div class=\"stuff\">\n"
+        "    blah 0\n"
+        "  </div>\n"
+        "  nada\n"
+        "</div>\n");
+    }
+
     it "leverages document headers"
     {
       n = fara_haml_parse_s(

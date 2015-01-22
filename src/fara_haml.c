@@ -25,6 +25,7 @@
 
 // https://github.com/flon-io/aranye
 
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdlib.h>
@@ -90,7 +91,7 @@ void haml_parser_init()
     fabr_n_rex("bll", "[ \t]*");
 
   fabr_parser *text_line =
-    fabr_n_rex("txl", "[^\r\n]+");
+    fabr_n_seq("txl", ind, fabr_rex("[^\r\n]+"), NULL);
 
   fabr_parser *haml_comment_line =
     fabr_n_seq("hacol", fabr_string("-#"), fabr_rex("[^\r\n]*"), NULL);
@@ -266,9 +267,7 @@ static fara_node *stack_evl(
 static fara_node *stack_txl(
   fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
 {
-  fara_node_push(n, fara_node_malloc(fabr_tree_string(s, t), NULL));
-
-  return n;
+  return push_to_parent(n, t, fara_node_malloc(fabr_tree_string(s, t), NULL));
 }
 
 static fara_node *stack(
