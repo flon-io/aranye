@@ -154,6 +154,37 @@ context "haml:"
         "</div>\n");
     }
 
+    it "tolerates handlebars"
+    {
+      n = fara_haml_parse_s(
+        ".hidden\n"
+        "  #optionTemplate\n"
+        "    .option\n"
+        "      {{ name }}\n"
+        "    .values\n"
+        "      {{ #each values }}\n"
+        "      .value{ data-id: \"{{ id }}\" }\n"
+        "        {{ name }}\n"
+        "      {{ /each }}\n"
+        "");
+
+      expect(fara_node_to_html(n, 1) ===f ""
+        "<div class=\"hidden\">\n"
+        "  <div id=\"optionTemplate\">\n"
+        "    <div class=\"option\">\n"
+        "      {{ name }}\n"
+        "    </div>\n"
+        "    <div class=\"values\">\n"
+        "      {{ #each values }}\n"
+        "      <div class=\"value\" data-id=\"{{ id }}\">\n"
+        "        {{ name }}\n"
+        "      </div>\n"
+        "      {{ /each }}\n"
+        "    </div>\n"
+        "  </div>\n"
+        "</div>\n");
+    }
+
     it "leverages document headers"
     {
       n = fara_haml_parse_s(
