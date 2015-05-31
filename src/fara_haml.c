@@ -147,7 +147,12 @@
 //        line,
 //        fabr_r("*")),
 //      NULL);
-//
+
+static fabr_tree *_haml(fabr_input *i)
+{
+  return NULL;
+}
+
 //  header_parser =
 //    fabr_rep(
 //      fabr_n_seq(
@@ -158,16 +163,31 @@
 //        fabr_rex("[\n\r]"),
 //        NULL),
 //      0, -1);
-//}
 
-static fabr_tree *_haml(fabr_input *i)
+static fabr_tree *_hk(fabr_input *i)
 {
-  return NULL;
+  return fabr_rex("k", i, "[^ \t:]+");
+}
+static fabr_tree *_hcolon(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[ \t]*:[ \t]*");
+}
+static fabr_tree *_hv(fabr_input *i)
+{
+  return fabr_rex("v", i, "[^\n\r]+");
+}
+static fabr_tree *_heol(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[\n\r]");
+}
+static fabr_tree *_he(fabr_input *i)
+{
+  return fabr_seq("e", i, _hk, _hcolon, _hv, _heol, NULL);
 }
 
 static fabr_tree *_header(fabr_input *i)
 {
-  return NULL;
+  return fabr_rep(NULL, i, _he, 0, 0); // 0 or more
 }
 
 static fara_node *push_to_parent(
