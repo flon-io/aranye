@@ -36,128 +36,138 @@
 #include "fara_haml.h"
 
 
-fabr_parser *haml_parser = NULL;
-fabr_parser *header_parser = NULL;
+//fabr_parser *haml_parser = NULL;
+//fabr_parser *header_parser = NULL;
+//
+//void haml_parser_init()
+//{
+//  fabr_parser *jsentry =
+//    fabr_n_seq(
+//      "jsentry",
+//      fabr_n_rex("k", "[^ \t\r\n:]+"),
+//      fabr_rex("[ \t]*:[ \t]*"),
+//      fabr_alt(
+//        fabr_seq(
+//          fabr_string("\""),
+//          fabr_n_rex("v", "[^\"\r\n,]*"),
+//          fabr_string("\""),
+//          NULL),
+//        fabr_seq(
+//          fabr_string("'"),
+//          fabr_n_rex("v", "[^'\r\n,]*"),
+//          fabr_string("'"),
+//          NULL),
+//        fabr_n_rex("v", "[^ \t\r\n,]+"),
+//        NULL),
+//      NULL);
+//  fabr_parser *jsatts =
+//    fabr_n_seq(
+//      "jsatts",
+//      fabr_rex("[ \t]*\\{[ \t]*"),
+//      fabr_seq(
+//        jsentry, fabr_seq(fabr_rex("[ \t]*,[ \t]*"), jsentry, fabr_r("*")), NULL
+//      ), fabr_q("?"),
+//      fabr_rex("[ \t]*}[ \t]*"),
+//      NULL);
+//
+//  fabr_parser *htatts =
+//    fabr_string("( x=\"y\" )"); // TODO
+//
+//  fabr_parser *tic =
+//    fabr_n_alt(
+//      "tic",
+//      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z\\-_0-9]+"), NULL),
+//      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z\\-_0-9]+"), NULL),
+//      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z\\-_0-9]+"), NULL),
+//      NULL);
+//
+//  fabr_parser *ind =
+//    fabr_n_rex("ind", "[ ]*");
+//
+//  fabr_parser *eval_eol =
+//    fabr_seq(fabr_str("="), fabr_n_rex("ev", "[^\r\n]*"), NULL);
+//
+//  fabr_parser *blank_line =
+//    fabr_n_rex("bll", "[ \t]*");
+//
+//  fabr_parser *text_line =
+//    fabr_n_seq("txl", ind, fabr_rex("[^\r\n]+"), NULL);
+//
+//  fabr_parser *haml_comment_line =
+//    fabr_n_seq("hacol", fabr_string("-#"), fabr_rex("[^\r\n]*"), NULL);
+//
+//  fabr_parser *html_comment_line =
+//    fabr_n_seq("htcol", fabr_string("/"), fabr_rex("[^\r\n]*"), NULL);
+//
+//  fabr_parser *filter_line =
+//    fabr_n_seq( "fil", ind, fabr_rex(":[a-z]+"), NULL);
+//
+//  fabr_parser *eval_line =
+//    fabr_n_seq("evl", ind, fabr_rex("=[ \t]*"), fabr_n_rex("ev", "[^\r\n]+"), NULL);
+//
+//  fabr_parser *elt_line =
+//    fabr_n_seq(
+//      "ell",
+//      ind,
+//      tic, fabr_q("+"),
+//      jsatts, fabr_q("?"),
+//      htatts, fabr_q("?"),
+//      eval_eol, fabr_q("?"),
+//      NULL);
+//
+//  fabr_parser *line =
+//    fabr_n_alt(
+//      "l",
+//      elt_line, eval_line, filter_line, html_comment_line, haml_comment_line,
+//      text_line,
+//      blank_line,
+//      NULL);
+//
+//  fabr_parser *doctype =
+//    fabr_seq(
+//      fabr_rex("!!![ \t]*"),
+//      fabr_n_rex("dt", "[^\n\r]*"),
+//      fabr_rex("[\n\r]+"),
+//      NULL);
+//
+//  fabr_parser *headers =
+//    fabr_seq(
+//      fabr_rex("---[ \t]*[\n\r]+"),
+//      fabr_n_rep("hes", fabr_rex("[^-].*[\n\r]"), 0, -1),
+//      fabr_rex("---[ \t]*[\n\r]+"),
+//      NULL);
+//
+//  haml_parser =
+//    fabr_seq(
+//      headers, fabr_q("?"),
+//      doctype, fabr_q("?"),
+//      line,
+//      fabr_seq(
+//        fabr_rex("[\n\r]"),
+//        line,
+//        fabr_r("*")),
+//      NULL);
+//
+//  header_parser =
+//    fabr_rep(
+//      fabr_n_seq(
+//        "e",
+//        fabr_n_rex("k", "[^ \t:]+"),
+//        fabr_rex("[ \t]*:[ \t]*"),
+//        fabr_n_rex("v", "[^\n\r]+"),
+//        fabr_rex("[\n\r]"),
+//        NULL),
+//      0, -1);
+//}
 
-void haml_parser_init()
+static fabr_tree *_haml(fabr_input *i)
 {
-  fabr_parser *jsentry =
-    fabr_n_seq(
-      "jsentry",
-      fabr_n_rex("k", "[^ \t\r\n:]+"),
-      fabr_rex("[ \t]*:[ \t]*"),
-      fabr_alt(
-        fabr_seq(
-          fabr_string("\""),
-          fabr_n_rex("v", "[^\"\r\n,]*"),
-          fabr_string("\""),
-          NULL),
-        fabr_seq(
-          fabr_string("'"),
-          fabr_n_rex("v", "[^'\r\n,]*"),
-          fabr_string("'"),
-          NULL),
-        fabr_n_rex("v", "[^ \t\r\n,]+"),
-        NULL),
-      NULL);
-  fabr_parser *jsatts =
-    fabr_n_seq(
-      "jsatts",
-      fabr_rex("[ \t]*\\{[ \t]*"),
-      fabr_seq(
-        jsentry, fabr_seq(fabr_rex("[ \t]*,[ \t]*"), jsentry, fabr_r("*")), NULL
-      ), fabr_q("?"),
-      fabr_rex("[ \t]*}[ \t]*"),
-      NULL);
+  return NULL;
+}
 
-  fabr_parser *htatts =
-    fabr_string("( x=\"y\" )"); // TODO
-
-  fabr_parser *tic =
-    fabr_n_alt(
-      "tic",
-      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z\\-_0-9]+"), NULL),
-      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z\\-_0-9]+"), NULL),
-      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z\\-_0-9]+"), NULL),
-      NULL);
-
-  fabr_parser *ind =
-    fabr_n_rex("ind", "[ ]*");
-
-  fabr_parser *eval_eol =
-    fabr_seq(fabr_str("="), fabr_n_rex("ev", "[^\r\n]*"), NULL);
-
-  fabr_parser *blank_line =
-    fabr_n_rex("bll", "[ \t]*");
-
-  fabr_parser *text_line =
-    fabr_n_seq("txl", ind, fabr_rex("[^\r\n]+"), NULL);
-
-  fabr_parser *haml_comment_line =
-    fabr_n_seq("hacol", fabr_string("-#"), fabr_rex("[^\r\n]*"), NULL);
-
-  fabr_parser *html_comment_line =
-    fabr_n_seq("htcol", fabr_string("/"), fabr_rex("[^\r\n]*"), NULL);
-
-  fabr_parser *filter_line =
-    fabr_n_seq( "fil", ind, fabr_rex(":[a-z]+"), NULL);
-
-  fabr_parser *eval_line =
-    fabr_n_seq("evl", ind, fabr_rex("=[ \t]*"), fabr_n_rex("ev", "[^\r\n]+"), NULL);
-
-  fabr_parser *elt_line =
-    fabr_n_seq(
-      "ell",
-      ind,
-      tic, fabr_q("+"),
-      jsatts, fabr_q("?"),
-      htatts, fabr_q("?"),
-      eval_eol, fabr_q("?"),
-      NULL);
-
-  fabr_parser *line =
-    fabr_n_alt(
-      "l",
-      elt_line, eval_line, filter_line, html_comment_line, haml_comment_line,
-      text_line,
-      blank_line,
-      NULL);
-
-  fabr_parser *doctype =
-    fabr_seq(
-      fabr_rex("!!![ \t]*"),
-      fabr_n_rex("dt", "[^\n\r]*"),
-      fabr_rex("[\n\r]+"),
-      NULL);
-
-  fabr_parser *headers =
-    fabr_seq(
-      fabr_rex("---[ \t]*[\n\r]+"),
-      fabr_n_rep("hes", fabr_rex("[^-].*[\n\r]"), 0, -1),
-      fabr_rex("---[ \t]*[\n\r]+"),
-      NULL);
-
-  haml_parser =
-    fabr_seq(
-      headers, fabr_q("?"),
-      doctype, fabr_q("?"),
-      line,
-      fabr_seq(
-        fabr_rex("[\n\r]"),
-        line,
-        fabr_r("*")),
-      NULL);
-
-  header_parser =
-    fabr_rep(
-      fabr_n_seq(
-        "e",
-        fabr_n_rex("k", "[^ \t:]+"),
-        fabr_rex("[ \t]*:[ \t]*"),
-        fabr_n_rex("v", "[^\n\r]+"),
-        fabr_rex("[\n\r]"),
-        NULL),
-      0, -1);
+static fabr_tree *_header(fabr_input *i)
+{
+  return NULL;
 }
 
 static fara_node *push_to_parent(
@@ -286,7 +296,7 @@ static void *default_header_callback(
 {
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
-  fabr_tree *t = fabr_parse_all(s, 0, header_parser);
+  fabr_tree *t = fabr_parse_all(s, _header);
   //flu_putf(fabr_tree_to_string(t, s, 1));
 
   flu_list *es = fabr_tree_list_named(t, "e");
@@ -403,8 +413,6 @@ static void *default_eval_callback(
 fara_node *fara_haml_parse(
   const char *s, flu_dict *rootd, flu_dict *callbacks, void *data)
 {
-  if (haml_parser == NULL) haml_parser_init();
-
   // prepare callbacks
 
   int own_callbacks = 0;
@@ -427,7 +435,7 @@ fara_node *fara_haml_parse(
   //flu_putf(fabr_tree_to_string(tt, s, 1));
   //fabr_tree_free(tt);
 
-  fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
+  fabr_tree *t = fabr_parse_all(s, _haml);
   //flu_putf(fabr_tree_to_string(t, s, 1));
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node

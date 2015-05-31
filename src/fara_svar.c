@@ -35,44 +35,49 @@
 #include "fara_svar.h"
 
 
-fabr_parser *parser = NULL;
+//fabr_parser *parser = NULL;
+//
+//static void init_parser()
+//{
+//  fabr_parser *con = fabr_n_string(">", "/*");
+//  fabr_parser *coff = fabr_n_string("<", "*/");
+//
+//  fabr_parser *literal =
+//    //fabr_n_rex("l", "[^\\$;\n\r/]+");
+//    fabr_n_rex("l", "(/[^/\\*\\$;\n\r]|[^\\$;\n\r/])+");
+//  fabr_parser *reference =
+//    fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]+");
+//  fabr_parser *semi =
+//    fabr_n_rex("s", "[ \t]*;[ \t]*");
+//
+//  fabr_parser *eol =
+//    fabr_n_seq(
+//      "/",
+//      fabr_rex("//[^\n\r]*"), fabr_q("?"),
+//      fabr_n_rex("n", "[\n\r]+"),
+//      NULL);
+//
+//  fabr_parser *text =
+//    fabr_seq(
+//      fabr_alt(reference, con, coff, literal, semi, NULL), fabr_q("+"),
+//      eol,
+//      NULL);
+//
+//  fabr_parser *definition =
+//    fabr_n_seq(
+//      "d",
+//      fabr_rex("[ \t]*"),
+//      fabr_n_rex("k", "\\$[a-zA-Z0-9_-]+"),
+//      fabr_rex("[ \t]*:[ \t]*"),
+//      fabr_name("v", text),
+//      NULL);
+//
+//  parser = fabr_alt(definition, text, NULL);
+//}
 
-static void init_parser()
+static fabr_tree *_def_or_text(fabr_input *i)
 {
-  fabr_parser *con = fabr_n_string(">", "/*");
-  fabr_parser *coff = fabr_n_string("<", "*/");
-
-  fabr_parser *literal =
-    //fabr_n_rex("l", "[^\\$;\n\r/]+");
-    fabr_n_rex("l", "(/[^/\\*\\$;\n\r]|[^\\$;\n\r/])+");
-  fabr_parser *reference =
-    fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]+");
-  fabr_parser *semi =
-    fabr_n_rex("s", "[ \t]*;[ \t]*");
-
-  fabr_parser *eol =
-    fabr_n_seq(
-      "/",
-      fabr_rex("//[^\n\r]*"), fabr_q("?"),
-      fabr_n_rex("n", "[\n\r]+"),
-      NULL);
-
-  fabr_parser *text =
-    fabr_seq(
-      fabr_alt(reference, con, coff, literal, semi, NULL), fabr_q("+"),
-      eol,
-      NULL);
-
-  fabr_parser *definition =
-    fabr_n_seq(
-      "d",
-      fabr_rex("[ \t]*"),
-      fabr_n_rex("k", "\\$[a-zA-Z0-9_-]+"),
-      fabr_rex("[ \t]*:[ \t]*"),
-      fabr_name("v", text),
-      NULL);
-
-  parser = fabr_alt(definition, text, NULL);
+  return NULL;
 }
 
 static short lsr_filter(const fabr_tree *t)
@@ -162,13 +167,11 @@ static char *trim(char *line)
 
 char *fara_extrapolate(const char *line, flu_dict *vars)
 {
-  if (parser == NULL) init_parser();
-
   //printf("line >%s<\n", line);
   //fabr_tree *tt = fabr_parse_f(line, 0, parser, 0);
   //flu_putf(fabr_tree_to_string(tt, line, 1));
 
-  fabr_tree *t = fabr_parse_all(line, 0, parser);
+  fabr_tree *t = fabr_parse_all(line, _def_or_text);
 
   //flu_putf(fabr_tree_to_string(t, line, 1));
 
