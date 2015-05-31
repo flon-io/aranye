@@ -150,7 +150,12 @@
 
 static fabr_tree *_haml(fabr_input *i)
 {
-  return NULL;
+  return fabr_seq(
+    NULL, i,
+    _headers, fabr_qmark,
+    _doctype, fabr_qmark,
+    _lines,
+    NULL);
 }
 
 //  header_parser =
