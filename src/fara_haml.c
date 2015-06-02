@@ -36,11 +36,9 @@
 #include "fara_haml.h"
 
 
-//fabr_parser *haml_parser = NULL;
-//fabr_parser *header_parser = NULL;
-//
-//void haml_parser_init()
-//{
+static fabr_tree *_nls(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]*"); }
+static fabr_tree *_nlp(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]+"); }
+
 //  fabr_parser *jsentry =
 //    fabr_n_seq(
 //      "jsentry",
@@ -73,17 +71,6 @@
 //  fabr_parser *htatts =
 //    fabr_string("( x=\"y\" )"); // TODO
 //
-//  fabr_parser *tic =
-//    fabr_n_alt(
-//      "tic",
-//      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z\\-_0-9]+"), NULL),
-//      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z\\-_0-9]+"), NULL),
-//      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z\\-_0-9]+"), NULL),
-//      NULL);
-//
-//  fabr_parser *ind =
-//    fabr_n_rex("ind", "[ ]*");
-//
 //  fabr_parser *eval_eol =
 //    fabr_seq(fabr_str("="), fabr_n_rex("ev", "[^\r\n]*"), NULL);
 //
@@ -104,7 +91,28 @@
 //
 //  fabr_parser *eval_line =
 //    fabr_n_seq("evl", ind, fabr_rex("=[ \t]*"), fabr_n_rex("ev", "[^\r\n]+"), NULL);
-//
+
+//  fabr_parser *ind =
+//    fabr_n_rex("ind", "[ ]*");
+
+static fabr_tree *_ind(fabr_input *i) // indentation
+{
+  return fabr_rex("ind", i, "[ ]*");
+}
+
+//  fabr_parser *tic =
+//    fabr_n_alt(
+//      "tic",
+//      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z\\-_0-9]+"), NULL),
+//      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z\\-_0-9]+"), NULL),
+//      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z\\-_0-9]+"), NULL),
+//      NULL);
+
+static fabr_tree *_tic(fabr_input *i)
+{
+  return fabr_n_rex("tic", i, "[%#.][a-zA-Z\\-_0-9]+");
+}
+
 //  fabr_parser *elt_line =
 //    fabr_n_seq(
 //      "ell",
@@ -114,7 +122,18 @@
 //      htatts, fabr_q("?"),
 //      eval_eol, fabr_q("?"),
 //      NULL);
-//
+
+static fabr_tree *_elt_line(fabr_input *i)
+{
+  return fabr_seq("ell", i,
+    _ind,
+    _tic, fabr_plus,
+    _jsatts, fabr_qmark,
+    _htatts, fabr_qmark,
+    _eval_eol, fabr_qmark,
+    NULL);
+}
+
 //  fabr_parser *line =
 //    fabr_n_alt(
 //      "l",
@@ -122,21 +141,62 @@
 //      text_line,
 //      blank_line,
 //      NULL);
-//
+
+static fabr_tree *_l(fabr_input *i)
+{
+  return fabr_alt("l", i,
+    _elt_line, _eval_line, _filter_line,
+    _html_comment_line, _haml_comment_line,
+    _text_line, _blank_line,
+    NULL);
+}
+
+static fabr_tree *_line(fabr_input *i)
+{
+  return fabr_seq(NULL, i, _nls, _l, NULL);
+}
+
 //  fabr_parser *doctype =
 //    fabr_seq(
 //      fabr_rex("!!![ \t]*"),
 //      fabr_n_rex("dt", "[^\n\r]*"),
 //      fabr_rex("[\n\r]+"),
 //      NULL);
-//
+
+static fabr_tree *_dta(fabr_input *i) { return fabr_rex(NULL, i, "!!![ \t]*"); }
+static fabr_tree *_dt(fabr_input *i) { return fabr_rex("dt", i, "[^\n\r]*"); }
+static fabr_tree *_dtz(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]+"); }
+
+static fabr_tree *_doctype(fabr_input *i)
+{
+  return fabr_seq(NULL, i, _dta, _dt, _dtz, NULL);
+}
+
 //  fabr_parser *headers =
 //    fabr_seq(
 //      fabr_rex("---[ \t]*[\n\r]+"),
 //      fabr_n_rep("hes", fabr_rex("[^-].*[\n\r]"), 0, -1),
 //      fabr_rex("---[ \t]*[\n\r]+"),
 //      NULL);
-//
+
+static fabr_tree *_header_line(fabr_input *i)
+{
+  return fabr_rex("hel", i, "[^-].*[\n\r]+");
+}
+static fabr_tree *_dash_line(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "---[ \t]*[\n\r]+");
+}
+
+static fabr_tree *_headers(fabr_input *i)
+{
+  return fabr_seq(NULL, i,
+    _dash_line,
+    _header_line, fabr_star,
+    _dash_line,
+    NULL);
+}
+
 //  haml_parser =
 //    fabr_seq(
 //      headers, fabr_q("?"),
@@ -150,11 +210,10 @@
 
 static fabr_tree *_haml(fabr_input *i)
 {
-  return fabr_seq(
-    NULL, i,
+  return fabr_seq(NULL, i,
     _headers, fabr_qmark,
     _doctype, fabr_qmark,
-    _lines,
+    _line, fabr_star
     NULL);
 }
 
@@ -194,6 +253,7 @@ static fabr_tree *_header(fabr_input *i)
 {
   return fabr_rep(NULL, i, _he, 0, 0); // 0 or more
 }
+
 
 static fara_node *push_to_parent(
   fara_node *current, fabr_tree *newt, fara_node *newn)
