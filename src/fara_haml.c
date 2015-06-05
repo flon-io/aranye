@@ -37,64 +37,88 @@
 
 
 static fabr_tree *_nls(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]*"); }
-static fabr_tree *_nlp(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]+"); }
+//static fabr_tree *_nlp(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]+"); }
 
-//
-//  fabr_parser *htatts =
-//    fabr_string("( x=\"y\" )"); // TODO
-//
-//  fabr_parser *eval_eol =
-//    fabr_seq(fabr_str("="), fabr_n_rex("ev", "[^\r\n]*"), NULL);
-//
-//  fabr_parser *blank_line =
-//    fabr_n_rex("bll", "[ \t]*");
-//
-//  fabr_parser *text_line =
-//    fabr_n_seq("txl", ind, fabr_rex("[^\r\n]+"), NULL);
-//
-//  fabr_parser *haml_comment_line =
-//    fabr_n_seq("hacol", fabr_string("-#"), fabr_rex("[^\r\n]*"), NULL);
-//
-//  fabr_parser *html_comment_line =
-//    fabr_n_seq("htcol", fabr_string("/"), fabr_rex("[^\r\n]*"), NULL);
-//
-//  fabr_parser *filter_line =
-//    fabr_n_seq( "fil", ind, fabr_rex(":[a-z]+"), NULL);
-//
-//  fabr_parser *eval_line =
-//    fabr_n_seq("evl", ind, fabr_rex("=[ \t]*"), fabr_n_rex("ev", "[^\r\n]+"), NULL);
+static fabr_tree *_indentation(fabr_input *i)
+{
+  return fabr_rex("i", i, "[ ]*");
+}
 
-//  fabr_parser *jsentry =
-//    fabr_n_seq(
-//      "jsentry",
-//      fabr_n_rex("k", "[^ \t\r\n:]+"),
-//      fabr_rex("[ \t]*:[ \t]*"),
-//      fabr_alt(
-//        fabr_seq(
-//          fabr_string("\""),
-//          fabr_n_rex("v", "[^\"\r\n,]*"),
-//          fabr_string("\""),
-//          NULL),
-//        fabr_seq(
-//          fabr_string("'"),
-//          fabr_n_rex("v", "[^'\r\n,]*"),
-//          fabr_string("'"),
-//          NULL),
-//        fabr_n_rex("v", "[^ \t\r\n,]+"),
-//        NULL),
-//      NULL);
-//  fabr_parser *jsatts =
-//    fabr_n_seq(
-//      "jsatts",
-//      fabr_rex("[ \t]*\\{[ \t]*"),
-//      fabr_seq(
-//        jsentry, fabr_seq(fabr_rex("[ \t]*,[ \t]*"), jsentry, fabr_r("*")), NULL
-//      ), fabr_q("?"),
-//      fabr_rex("[ \t]*}[ \t]*"),
-//      NULL);
+static fabr_tree *_ht_atts(fabr_input *i)
+{
+  return fabr_str("ht_atts", i, "( x=\"y\" )"); // TODO
+}
+
+static fabr_tree *_eval_eol(fabr_input *i)
+{
+  return fabr_rex("ev", i, "=[^\r\n]*");
+}
+
+static fabr_tree *_blank_line(fabr_input *i)
+{
+  return fabr_rex("bll", i, "[ \t]*");
+}
+
+static fabr_tree *_text_eol(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[^\r\n]+");
+}
+static fabr_tree *_text_line(fabr_input *i)
+{
+  return fabr_seq("txl", i, _indentation, _text_eol, NULL);
+}
+
+static fabr_tree *_haml_comment_line(fabr_input *i)
+{
+  return fabr_rex("htcol", i, "[ ]*-#[^\r\n]*");
+}
+static fabr_tree *_html_comment_line(fabr_input *i)
+{
+  return fabr_rex("htcol", i, "[ ]*/[^\r\n]*");
+}
+
+static fabr_tree *_filter_eol(fabr_input *i)
+{
+  return fabr_rex(NULL, i, ":[a-z]+");
+}
+static fabr_tree *_filter_line(fabr_input *i)
+{
+  return fabr_seq("fil", i, _indentation, _filter_eol, NULL);
+}
+
+static fabr_tree *_eval_line(fabr_input *i)
+{
+  return fabr_seq("evl", i, _indentation, _eval_eol, NULL);
+}
+
+static fabr_tree *_js_key(fabr_input *i)
+{
+  return fabr_rex("k", i, "[^ \t\r\n:]+");
+}
+static fabr_tree *_js_col(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[ \t]*:[ \t]*");
+}
+static fabr_tree *_dq_string(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "\"[^\"\r\n,]*\"");
+}
+static fabr_tree *_sq_string(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "'[^'\r\n,]*'");
+}
+static fabr_tree *_word(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[^ \t\r\n,]+");
+}
+static fabr_tree *_js_val(fabr_input *i)
+{
+  return fabr_alt("v", i, _dq_string, _sq_string, _word, NULL);
+}
 
 static fabr_tree *_js_entry(fabr_input *i)
 {
+  return fabr_seq("js_entry", i, _js_key, _js_col, _js_val, NULL);
 }
 
 static fabr_tree *_js_comma(fabr_input *i)
@@ -102,76 +126,35 @@ static fabr_tree *_js_comma(fabr_input *i)
   return fabr_rex(NULL, i, "[ \t]*,[ \t]*");
 }
 
-//static fabr_tree *_js_entries(fabr_input *i)
-//{
-//  return fabr_jseq(NULL, i, _js_entry, _js_comma);
-//}
-
 static fabr_tree *_pbs(fabr_input *i) // pointy bracket start
 {
   return fabr_rex(NULL, i, "[ \t]*\\{[ \t]*");
 }
 static fabr_tree *_pbe(fabr_input *i) // pointy bracket end
 {
-  return fabr_rex(NULL, i, "[ \t]*}[ \t]*"),
+  return fabr_rex(NULL, i, "[ \t]*}[ \t]*");
 }
 
 static fabr_tree *_js_atts(fabr_input *i)
 {
-  //return fabr_seq("js_atts", i,
-  //  _pbs, _js_entries, _pbe, NULL);
   return fabr_eseq("js_atts", i, _pbs, _js_entry, _js_comma, _pbe);
 }
 
-//  fabr_parser *ind =
-//    fabr_n_rex("ind", "[ ]*");
-
-static fabr_tree *_indentation(fabr_input *i)
-{
-  return fabr_rex("i", i, "[ ]*");
-}
-
-//  fabr_parser *tic =
-//    fabr_n_alt(
-//      "tic",
-//      fabr_seq(fabr_str("%"), fabr_n_rex("ta", "[a-zA-Z\\-_0-9]+"), NULL),
-//      fabr_seq(fabr_str("#"), fabr_n_rex("id", "[a-zA-Z\\-_0-9]+"), NULL),
-//      fabr_seq(fabr_str("."), fabr_n_rex("cl", "[a-zA-Z\\-_0-9]+"), NULL),
-//      NULL);
-
 static fabr_tree *_tic(fabr_input *i) // Tag, Id, Class
 {
-  return fabr_n_rex("tic", i, "[%#.][a-zA-Z\\-_0-9]+");
+  return fabr_rex("tic", i, "[%#.][a-zA-Z\\-_0-9]+");
 }
-
-//  fabr_parser *elt_line =
-//    fabr_n_seq(
-//      "ell",
-//      ind,
-//      tic, fabr_q("+"),
-//      jsatts, fabr_q("?"),
-//      htatts, fabr_q("?"),
-//      eval_eol, fabr_q("?"),
-//      NULL);
 
 static fabr_tree *_elt_line(fabr_input *i)
 {
   return fabr_seq("ell", i,
-    _indendation,
+    _indentation,
     _tic, fabr_plus,
     _js_atts, fabr_qmark,
     _ht_atts, fabr_qmark,
     _eval_eol, fabr_qmark,
     NULL);
 }
-
-//  fabr_parser *line =
-//    fabr_n_alt(
-//      "l",
-//      elt_line, eval_line, filter_line, html_comment_line, haml_comment_line,
-//      text_line,
-//      blank_line,
-//      NULL);
 
 static fabr_tree *_l(fabr_input *i)
 {
@@ -187,13 +170,6 @@ static fabr_tree *_line(fabr_input *i)
   return fabr_seq(NULL, i, _nls, _l, NULL);
 }
 
-//  fabr_parser *doctype =
-//    fabr_seq(
-//      fabr_rex("!!![ \t]*"),
-//      fabr_n_rex("dt", "[^\n\r]*"),
-//      fabr_rex("[\n\r]+"),
-//      NULL);
-
 static fabr_tree *_dta(fabr_input *i) { return fabr_rex(NULL, i, "!!![ \t]*"); }
 static fabr_tree *_dt(fabr_input *i) { return fabr_rex("dt", i, "[^\n\r]*"); }
 static fabr_tree *_dtz(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]+"); }
@@ -202,13 +178,6 @@ static fabr_tree *_doctype(fabr_input *i)
 {
   return fabr_seq(NULL, i, _dta, _dt, _dtz, NULL);
 }
-
-//  fabr_parser *headers =
-//    fabr_seq(
-//      fabr_rex("---[ \t]*[\n\r]+"),
-//      fabr_n_rep("hes", fabr_rex("[^-].*[\n\r]"), 0, -1),
-//      fabr_rex("---[ \t]*[\n\r]+"),
-//      NULL);
 
 static fabr_tree *_header_line(fabr_input *i)
 {
@@ -228,17 +197,6 @@ static fabr_tree *_headers(fabr_input *i)
     NULL);
 }
 
-//  haml_parser =
-//    fabr_seq(
-//      headers, fabr_q("?"),
-//      doctype, fabr_q("?"),
-//      line,
-//      fabr_seq(
-//        fabr_rex("[\n\r]"),
-//        line,
-//        fabr_r("*")),
-//      NULL);
-
 static fabr_tree *_haml(fabr_input *i)
 {
   return fabr_seq(NULL, i,
@@ -247,17 +205,6 @@ static fabr_tree *_haml(fabr_input *i)
     _line, fabr_star
     NULL);
 }
-
-//  header_parser =
-//    fabr_rep(
-//      fabr_n_seq(
-//        "e",
-//        fabr_n_rex("k", "[^ \t:]+"),
-//        fabr_rex("[ \t]*:[ \t]*"),
-//        fabr_n_rex("v", "[^\n\r]+"),
-//        fabr_rex("[\n\r]"),
-//        NULL),
-//      0, -1);
 
 static fabr_tree *_hk(fabr_input *i)
 {
