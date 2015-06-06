@@ -101,15 +101,15 @@ static fabr_tree *_js_col(fabr_input *i)
 }
 static fabr_tree *_dq_string(fabr_input *i)
 {
-  return fabr_rex(NULL, i, "\"[^\"\r\n,]*\"");
+  return fabr_rex("dqs", i, "\"[^\"\r\n,]*\"");
 }
 static fabr_tree *_sq_string(fabr_input *i)
 {
-  return fabr_rex(NULL, i, "'[^'\r\n,]*'");
+  return fabr_rex("sqs", i, "'[^'\r\n,]*'");
 }
 static fabr_tree *_word(fabr_input *i)
 {
-  return fabr_rex(NULL, i, "[^ \t\r\n,]+");
+  return fabr_rex("wos", i, "[^ \t\r\n,]+");
 }
 static fabr_tree *_js_val(fabr_input *i)
 {
@@ -273,7 +273,7 @@ static void eval_and_push(
 static fara_node *stack_ell(
   fara_node *n, const char *s, flu_dict *cbs, void *data, fabr_tree *t)
 {
-  //puts("---"); flu_putf(fabr_tree_to_string(t, s, 1));
+  //puts("---"); fabr_puts_tree(t, s, 1);
 
   fara_node *nn = fara_node_malloc(NULL, flu_list_malloc());
 
@@ -284,11 +284,22 @@ static fara_node *stack_ell(
   flu_list *ents = fabr_tree_list_named(t, "js_entry");
   for (flu_node *en = ents->first; en; en = en->next)
   {
-    flu_list_setk(
-      nn->atts,
-      fabr_lookup_string(s, en->item, "k"),
-      fabr_lookup_string(s, en->item, "v"),
-      1);
+    fabr_tree *ent = en->item;
+    //puts("{{{"); fabr_puts_tree(ent, s, 1);
+
+    fabr_tree *entv = fabr_tree_lookup(ent, "v")->child;
+    //puts("{{{"); fabr_puts_tree(entv, s, 1);
+
+    char *ks = fabr_lookup_string(s, en->item, "k");
+
+    char *vs = fabr_tree_string(s, entv);
+    if (strcmp(entv->name, "wos") != 0)
+    {
+      vs[strlen(vs) - 1] = 0;
+      strcpy(vs, vs + 1);
+    }
+
+    flu_list_setk(nn->atts, ks, vs, 1);
   }
   flu_list_free(ents);
 
