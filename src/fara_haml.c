@@ -202,7 +202,7 @@ static fabr_tree *_haml(fabr_input *i)
   return fabr_seq(NULL, i,
     _headers, fabr_qmark,
     _doctype, fabr_qmark,
-    _line, fabr_star
+    _line, fabr_star,
     NULL);
 }
 
