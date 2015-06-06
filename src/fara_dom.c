@@ -197,8 +197,16 @@ static void to_html(fara_node *n, int flags, flu_sbuffer *b, int indent)
     flu_sbprintf(b, "%*s<%s", i * 2, "", n->t);
     //
     flu_dict *atts = flu_list_dtrim(n->atts);
+    //
+    char *id = flu_list_get(atts, "id");
+    if (id) flu_sbprintf(b, " id=\"%s\"", id); // output id
+    char *cla = flu_list_get(atts, "class");
+    if (cla) flu_sbprintf(b, " class=\"%s\"", cla); // then class
+    //
     for (flu_node *fn = atts->first; fn; fn = fn->next)
     {
+      if (strcmp(fn->key, "id") == 0) continue;
+      if (strcmp(fn->key, "class") == 0) continue;
       flu_sbprintf(b, " %s=\"%s\"", fn->key, (char *)fn->item);
     }
     flu_list_free(atts);

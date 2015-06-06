@@ -281,7 +281,7 @@ static fara_node *stack_ell(
 
   // attributes
 
-  flu_list *ents = fabr_tree_list_named(t, "jsentry");
+  flu_list *ents = fabr_tree_list_named(t, "js_entry");
   for (flu_node *en = ents->first; en; en = en->next)
   {
     flu_list_setk(
@@ -292,26 +292,34 @@ static fara_node *stack_ell(
   }
   flu_list_free(ents);
 
-  // tag
+  // tic
 
-  char *ta = fabr_lookup_string(s, t, "ta");
-  nn->t = ta ? ta : strdup("div");
-
-  // class
-
-  flu_list *cs = fabr_tree_list_named(t, "cl");
-  for (flu_node *cn = cs->first; cn; cn = cn->next)
+  flu_list *tics = fabr_tree_list_named(t, "tic");
+  for (flu_node *tn = tics->first; tn; tn = tn->next)
   {
-    char *cl = fabr_tree_string(s, cn->item);
-    fara_node_add_class(nn, cl);
-    free(cl);
+    //puts("###"); fabr_puts_tree(tn->item, s, 1);
+
+    fabr_tree *tnt = tn->item;
+    char *tns = fabr_tree_string(s, tnt);
+
+    if (*fabr_tree_str(s, tnt) == '%')
+    {
+      free(nn->t); nn->t = strdup(tns + 1);
+    }
+    else if (*fabr_tree_str(s, tnt) == '#')
+    {
+      flu_list_set(nn->atts, "id", strdup(tns + 1));
+    }
+    else // '.'
+    {
+      fara_node_add_class(nn, tns + 1);
+    }
+
+    free(tns);
   }
-  flu_list_free(cs);
+  flu_list_free(tics);
 
-  // id
-
-  char *id = fabr_lookup_string(s, t, "id");
-  if (id) flu_list_set(nn->atts, "id", id);
+  if (nn->t == NULL) nn->t = strdup("div");
 
   // ev (%h1 = title)
 
@@ -494,12 +502,8 @@ fara_node *fara_haml_parse(
 
   //printf(">[0;33m%s[0;0m<\n", s);
 
-  //fabr_tree *tt = fabr_parse_f(s, 0, haml_parser, 0);
-  //flu_putf(fabr_tree_to_string(tt, s, 1));
-  //fabr_tree_free(tt);
-
   fabr_tree *t = fabr_parse_all(s, _haml);
-  //flu_putf(fabr_tree_to_string(t, s, 1));
+  //fabr_puts_tree(t, s, 1);
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
   r->data = (void *)-1; // ;-)
@@ -528,7 +532,7 @@ fara_node *fara_haml_parse(
   for (flu_node *n = ls->first; n; n = n->next)
   {
     fabr_tree *nl = ((fabr_tree *)n->item)->child;
-    //puts("---"); flu_putf(fabr_tree_to_string(nl, s, 1));
+    //puts("---"); fabr_puts_tree(nl, s, 1);
     r = stack(r, s, callbacks, data, nl);
   }
   flu_list_free(ls);
