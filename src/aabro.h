@@ -207,8 +207,8 @@ int fabr_match(const char *input, fabr_parser *p);
 
 #endif // FLON_AABRO_H
 
-//commit 2ec85a9c93bd0f4c9cfb5ea57baa6c3830ed70ad
+//commit 805fb680fa5507296e4caf0b3232290c247ee428
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Sat Jun 6 06:22:25 2015 +0900
+//Date:   Sat Jun 6 16:55:05 2015 +0900
 //
-//    use fabr_eseq() in spec/tree_functions_spec.rb
+//    simplify specs
