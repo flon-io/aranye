@@ -179,20 +179,24 @@ static fabr_tree *_doctype(fabr_input *i)
   return fabr_seq(NULL, i, _dta, _dt, _dtz, NULL);
 }
 
-static fabr_tree *_header_line(fabr_input *i)
-{
-  return fabr_rex("hel", i, "[^-].*[\n\r]+");
-}
 static fabr_tree *_dash_line(fabr_input *i)
 {
   return fabr_rex(NULL, i, "---[ \t]*[\n\r]+");
+}
+static fabr_tree *_header_line(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[^-].*[\n\r]+");
+}
+static fabr_tree *_header_lines(fabr_input *i)
+{
+  return fabr_rep("hls", i, _header_line, 0, 0);
 }
 
 static fabr_tree *_headers(fabr_input *i)
 {
   return fabr_seq(NULL, i,
     _dash_line,
-    _header_line, fabr_star,
+    _header_lines,
     _dash_line,
     NULL);
 }
@@ -379,7 +383,7 @@ static void *default_header_callback(
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
   fabr_tree *t = fabr_parse_all(s, _header);
-  //flu_putf(fabr_tree_to_string(t, s, 1));
+  flu_putf(fabr_tree_to_string(t, s, 1));
 
   flu_list *es = fabr_tree_list_named(t, "e");
   for (flu_node *en = es->first; en; en = en->next)
@@ -510,12 +514,12 @@ fara_node *fara_haml_parse(
 
   printf(">[0;33m%s[0;0m<\n", s);
 
-  fabr_tree *tt = fabr_parse_f(s, _haml, 0);
-  fabr_puts_tree(tt, s, 1);
-  fabr_tree_free(tt);
+  //fabr_tree *tt = fabr_parse_f(s, _haml, 0);
+  //fabr_puts_tree(tt, s, 1);
+  //fabr_tree_free(tt);
 
   fabr_tree *t = fabr_parse_all(s, _haml);
-  //fabr_puts_tree(t, s, 1);
+  fabr_puts_tree(t, s, 1);
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
   r->data = (void *)-1; // ;-)
@@ -524,13 +528,13 @@ fara_node *fara_haml_parse(
 
   // headers
 
-  char *hes = fabr_lookup_string(s, t, "hes");
+  char *hls = fabr_lookup_string(s, t, "hls");
 
-  if (hes)
+  if (hls)
   {
     fara_haml_callback *hcb = flu_list_get(callbacks, "header");
-    hcb(hes, r, callbacks, data);
-    free(hes);
+    hcb(hls, r, callbacks, data);
+    free(hls);
   }
 
   // doctype
