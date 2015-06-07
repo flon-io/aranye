@@ -508,10 +508,11 @@ fara_node *fara_haml_parse(
   flu_list_set_last(callbacks, "eval", default_eval_callback);
   flu_list_set_last(callbacks, "include", default_include_callback);
 
-  //puts("[1;30m"); puts(fabr_parser_to_string(haml_parser)); puts("[0;0m");
-  //fabr_tree *t = fabr_parse_all(s, 0, haml_parser);
+  printf(">[0;33m%s[0;0m<\n", s);
 
-  //printf(">[0;33m%s[0;0m<\n", s);
+  fabr_tree *tt = fabr_parse_f(s, _haml, 0);
+  fabr_puts_tree(tt, s, 1);
+  fabr_tree_free(tt);
 
   fabr_tree *t = fabr_parse_all(s, _haml);
   //fabr_puts_tree(t, s, 1);

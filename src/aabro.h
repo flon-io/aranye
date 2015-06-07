@@ -207,8 +207,10 @@ int fabr_match(const char *input, fabr_parser *p);
 
 #endif // FLON_AABRO_H
 
-//commit 805fb680fa5507296e4caf0b3232290c247ee428
+//commit e6c071a6d25c770a0b03f3d926f96a0a43a27e0c
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Sat Jun 6 16:55:05 2015 +0900
+//Date:   Sun Jun 7 09:13:24 2015 +0900
 //
-//    simplify specs
+//    implement the "." in fabr_rex()
+//    
+//    matches everything but a newline
