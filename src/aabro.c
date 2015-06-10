@@ -850,6 +850,7 @@ static fabr_tree *rex_seq(fabr_input *i, char *rx, size_t rxn)
 
   while (1)
   {
+    //if (*(i->string + i->offset) == '\0') break; // EOS
     if (rx_at(crx, crxn, 0) == '\0') break;
 
     *next = rex_rep(i, crx, crxn);
@@ -1082,8 +1083,8 @@ int fabr_match(const char *input, fabr_parser *p)
   return r;
 }
 
-//commit 06d8948a43bb4cec08551edde751a2375df089fe
+//commit 4091d874c41d84212b5ad0df303001d24c23ab44
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Sun Jun 7 11:42:26 2015 +0900
+//Date:   Tue Jun 9 08:01:01 2015 +0900
 //
-//    make sure fabr_rex() matches "" on "a?" or "a*"
+//    add fabr_rex() spec for "=[^\r\n]*"
