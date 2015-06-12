@@ -442,6 +442,8 @@ fabr_tree *fabr_alt(
   fabr_tree *r = fabr_tree_malloc(name, "alt", i, 0);
   r->result = 0;
 
+  if (*(i->string + i->offset) == 0) return r; // EOS
+
   fabr_tree **next = &r->child;
 
   va_list ap; va_start(ap, p);
@@ -1083,8 +1085,8 @@ int fabr_match(const char *input, fabr_parser *p)
   return r;
 }
 
-//commit 4091d874c41d84212b5ad0df303001d24c23ab44
+//commit 545ad34686efb3680e9f5210491af203a2f1304d
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Tue Jun 9 08:01:01 2015 +0900
+//Date:   Sat Jun 13 00:50:23 2015 +0900
 //
-//    add fabr_rex() spec for "=[^\r\n]*"
+//    add EOS check to fabr_alt()
