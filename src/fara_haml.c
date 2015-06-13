@@ -36,6 +36,9 @@
 #include "fara_haml.h"
 
 
+//
+// haml parser
+
 static fabr_tree *_nls(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]*"); }
 //static fabr_tree *_nlp(fabr_input *i) { return fabr_rex(NULL, i, "[\n\r]+"); }
 
@@ -149,10 +152,11 @@ static fabr_tree *_elt_line(fabr_input *i)
 {
   return fabr_seq("ell", i,
     _indentation,
-    _tic, fabr_plus,
+    _tic, fabr_plus, // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                     // will it loop in here?
     _js_atts, fabr_qmark,
     _ht_atts, fabr_qmark,
-    _eval_eol, fabr_qmark,
+    _eval_eol, fabr_qmark, // or here with the qmark???? (no, 1 or 0)
     NULL);
 }
 
@@ -162,6 +166,7 @@ static fabr_tree *_l(fabr_input *i)
     _elt_line, _eval_line, _filter_line,
     _html_comment_line, _haml_comment_line,
     _text_line, _blank_line,
+      // <<<< it's rather here...
     NULL);
 }
 
@@ -206,9 +211,12 @@ static fabr_tree *_haml(fabr_input *i)
   return fabr_seq(NULL, i,
     _headers, fabr_qmark,
     _doctype, fabr_qmark,
-    _line, fabr_star,
+    _line, fabr_star, // <<<<<<<<<<<<<<<<<<<<<<<
     NULL);
 }
+
+//
+// header parser
 
 static fabr_tree *_hk(fabr_input *i)
 {
@@ -236,6 +244,9 @@ static fabr_tree *_header(fabr_input *i)
   return fabr_rep(NULL, i, _he, 0, 0); // 0 or more
 }
 
+
+//
+// /parsers
 
 static fara_node *push_to_parent(
   fara_node *current, fabr_tree *newt, fara_node *newn)
@@ -383,7 +394,7 @@ static void *default_header_callback(
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
   fabr_tree *t = fabr_parse_all(s, _header);
-  flu_putf(fabr_tree_to_string(t, s, 1));
+  //flu_putf(fabr_tree_to_string(t, s, 1));
 
   flu_list *es = fabr_tree_list_named(t, "e");
   for (flu_node *en = es->first; en; en = en->next)
@@ -512,8 +523,8 @@ fara_node *fara_haml_parse(
   flu_list_set_last(callbacks, "eval", default_eval_callback);
   flu_list_set_last(callbacks, "include", default_include_callback);
 
-  printf(">[0;33m%s[0;0m<\n", s);
-
+  //printf(">[0;33m%s[0;0m<\n", s);
+  //
   //fabr_tree *tt = fabr_parse_f(s, _haml, 0);
   //fabr_puts_tree(tt, s, 1);
   //fabr_tree_free(tt);
@@ -548,7 +559,7 @@ fara_node *fara_haml_parse(
   for (flu_node *n = ls->first; n; n = n->next)
   {
     fabr_tree *nl = ((fabr_tree *)n->item)->child;
-    //puts("---"); fabr_puts_tree(nl, s, 1);
+    //puts("###"); fabr_puts_tree(nl, s, 1);
     r = stack(r, s, callbacks, data, nl);
   }
   flu_list_free(ls);
