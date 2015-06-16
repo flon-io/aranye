@@ -207,8 +207,8 @@ int fabr_match(const char *input, fabr_parser *p);
 
 #endif // FLON_AABRO_H
 
-//commit 545ad34686efb3680e9f5210491af203a2f1304d
+//commit 419477a2e7845a1695015d213804040d7e1c841b
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Sat Jun 13 00:50:23 2015 +0900
+//Date:   Tue Jun 16 08:58:25 2015 +0900
 //
-//    add EOS check to fabr_alt()
+//    fix "no progress" issue for fabr_rep()
