@@ -152,11 +152,10 @@ static fabr_tree *_elt_line(fabr_input *i)
 {
   return fabr_seq("ell", i,
     _indentation,
-    _tic, fabr_plus, // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                     // will it loop in here?
+    _tic, fabr_plus,
     _js_atts, fabr_qmark,
     _ht_atts, fabr_qmark,
-    _eval_eol, fabr_qmark, // or here with the qmark???? (no, 1 or 0)
+    _eval_eol, fabr_qmark,
     NULL);
 }
 
@@ -166,7 +165,6 @@ static fabr_tree *_l(fabr_input *i)
     _elt_line, _eval_line, _filter_line,
     _html_comment_line, _haml_comment_line,
     _text_line, _blank_line,
-      // <<<< it's rather here...
     NULL);
 }
 
@@ -211,7 +209,7 @@ static fabr_tree *_haml(fabr_input *i)
   return fabr_seq(NULL, i,
     _headers, fabr_qmark,
     _doctype, fabr_qmark,
-    _line, fabr_star, // <<<<<<<<<<<<<<<<<<<<<<<
+    _line, fabr_star,
     NULL);
 }
 
@@ -308,13 +306,17 @@ static fara_node *stack_ell(
     char *ks = fabr_lookup_string(s, en->item, "k");
 
     char *vs = fabr_tree_string(s, entv);
-    if (strcmp(entv->name, "wos") != 0)
+    //printf("{{{ %s >%s<\n", entv->name, vs);
+    if (strcmp(entv->name, "wos") != 0) // dqs or sqs
     {
       vs[strlen(vs) - 1] = 0;
-      strcpy(vs, vs + 1);
+      flu_list_setk(nn->atts, ks, strdup(vs + 1), 1);
+      free(vs);
     }
-
-    flu_list_setk(nn->atts, ks, vs, 1);
+    else
+    {
+      flu_list_setk(nn->atts, ks, vs, 1);
+    }
   }
   flu_list_free(ents);
 
