@@ -75,9 +75,36 @@
 //  parser = fabr_alt(definition, text, NULL);
 //}
 
-static fabr_tree *_def_or_text(fabr_input *i)
+static fabr_tree *_text(fabr_input *i)
 {
   return NULL;
+}
+
+static fabr_tree *_key(fabr_input *i)
+{
+  return fabr_rex("k", i, "\\$[a-zA-Z0-9_-]+");
+}
+static fabr_tree *_col(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[ \t]*:[ \t]*");
+}
+static fabr_tree *_val(fabr_input *i)
+{
+  return fabr_rename("v", _text);
+}
+static fabr_tree *_ind(fabr_input *i)
+{
+  return fabr_rex(NULL, i, "[ \t]*");
+}
+
+static fabr_tree *_definition(fabr_input *i)
+{
+  return fabr_seq("d", i, _ind, _key, _col, _val, NULL);
+}
+
+static fabr_tree *_def_or_text(fabr_input *i)
+{
+  return fabr_alt(NULL, i, _definition, _text, NULL);
 }
 
 static short lsr_filter(const fabr_tree *t)
