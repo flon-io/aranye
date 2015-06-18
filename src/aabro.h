@@ -177,6 +177,9 @@ fabr_tree *fabr_eseq(
 #define fabr_jseq(name, i, eltp, sepp) \
   fabr_eseq(name, i, NULL, eltp, sepp, NULL)
 
+fabr_tree *fabr_rename(
+  char *name, fabr_input *i, fabr_parser *p);
+
 fabr_tree *fabr_all(
   char *name, fabr_input *i, fabr_parser *p);
 
@@ -207,8 +210,8 @@ int fabr_match(const char *input, fabr_parser *p);
 
 #endif // FLON_AABRO_H
 
-//commit 419477a2e7845a1695015d213804040d7e1c841b
+//commit df93cbff3c1b97f1b86b5b7285aa703b36a9585a
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Tue Jun 16 08:58:25 2015 +0900
+//Date:   Thu Jun 18 07:01:11 2015 +0900
 //
-//    fix "no progress" issue for fabr_rep()
+//    implement fabr_rename()
