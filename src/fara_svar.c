@@ -75,15 +75,19 @@ static fabr_tree *_fragment(fabr_input *i)
   return fabr_alt(NULL, i, _reference, _con, _coff, _literal, _semi, NULL);
 }
 
+static fabr_tree *_eoc(fabr_input *i)
+{
+  return fabr_rex("/", i, "//[^\n\r]*");
+}
+
 static fabr_tree *_eol(fabr_input *i)
 {
-  //return fabr_seq("/", i, _eoc, fabr_qmark, _lfcr, NULL);
-  return fabr_rex("n", i, "(//[^\n\r]+)?[\n\r]+");
+  return fabr_rex("n", i, "[\n\r]+");
 }
 
 static fabr_tree *_text(fabr_input *i)
 {
-  return fabr_seq(NULL, i, _fragment, fabr_plus, _eol, NULL);
+  return fabr_seq(NULL, i, _fragment, fabr_plus, _eoc, fabr_qmark, _eol, NULL);
 }
 
 static fabr_tree *_key(fabr_input *i)
@@ -135,7 +139,7 @@ static char *semitrim(char *s)
 
 char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
 {
-  fabr_puts_tree(t, line, 1);
+  //fabr_puts_tree(t, line, 1);
 
   fabr_tree *d = fabr_tree_lookup(t, "d");
   if (d)
@@ -168,9 +172,10 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
 
     short con = *((char *)flu_list_getd(vars, "_comment_on", "f")) == 't';
 
-    printf("line >%s< n is '%c' ", line, n);
-    printf("match is >%s< ", fabr_tree_string(line, tt));
-    printf("fn->next: %p\n", fn->next);
+    //printf("line >%s< n is '%c' ", line, n);
+    //printf("match is >%s< ", fabr_tree_string(line, tt));
+    //printf("con is %i ", con);
+    //printf("fn->next: %p\n", fn->next);
 
     if (n == '/' && con == 0)
       tt = fabr_tree_lookup(tt, "n");
