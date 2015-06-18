@@ -35,10 +35,6 @@
 #include "fara_svar.h"
 
 
-//fabr_parser *parser = NULL;
-//
-//static void init_parser()
-//{
 //  fabr_parser *con = fabr_n_string(">", "/*");
 //  fabr_parser *coff = fabr_n_string("<", "*/");
 //
@@ -50,34 +46,44 @@
 //  fabr_parser *semi =
 //    fabr_n_rex("s", "[ \t]*;[ \t]*");
 //
-//  fabr_parser *eol =
-//    fabr_n_seq(
-//      "/",
-//      fabr_rex("//[^\n\r]*"), fabr_q("?"),
-//      fabr_n_rex("n", "[\n\r]+"),
-//      NULL);
-//
 //  fabr_parser *text =
 //    fabr_seq(
 //      fabr_alt(reference, con, coff, literal, semi, NULL), fabr_q("+"),
 //      eol,
 //      NULL);
-//
-//  fabr_parser *definition =
-//    fabr_n_seq(
-//      "d",
-//      fabr_rex("[ \t]*"),
-//      fabr_n_rex("k", "\\$[a-zA-Z0-9_-]+"),
-//      fabr_rex("[ \t]*:[ \t]*"),
-//      fabr_name("v", text),
-//      NULL);
-//
-//  parser = fabr_alt(definition, text, NULL);
-//}
+
+static fabr_tree *_con(fabr_input *i) { return fabr_str(">", i, "/*"); }
+static fabr_tree *_coff(fabr_input *i) { return fabr_str("<", i, "*/"); }
+
+static fabr_tree *_semi(fabr_input *i)
+{
+  return fabr_rex("s", i, "[ \t]*;[ \t]*");
+}
+
+static fabr_tree *_literal(fabr_input *i)
+{
+  return fabr_rex("l", i, "(/[^/\\*\\$;\n\r]|[^\\$;\n\r/])+");
+}
+
+static fabr_tree *_reference(fabr_input *i)
+{
+  return fabr_rex("r", i, "\\$[a-zA-Z-0-9_-]+");
+}
+
+static fabr_tree *_fragment(fabr_input *i)
+{
+  return fabr_alt(NULL, i, _reference, _con, _coff, _literal, _semi, NULL);
+}
+
+static fabr_tree *_eol(fabr_input *i)
+{
+  //return fabr_seq("/", i, _eoc, fabr_qmark, _lfcr, NULL);
+  return fabr_rex("n", i, "(//[^\n\r]+)?[\n\r]+");
+}
 
 static fabr_tree *_text(fabr_input *i)
 {
-  return NULL;
+  return fabr_seq(NULL, i, _fragment, fabr_plus, _eol, NULL);
 }
 
 static fabr_tree *_key(fabr_input *i)
@@ -90,7 +96,7 @@ static fabr_tree *_col(fabr_input *i)
 }
 static fabr_tree *_val(fabr_input *i)
 {
-  return fabr_rename("v", _text);
+  return fabr_rename("v", i, _text);
 }
 static fabr_tree *_ind(fabr_input *i)
 {
@@ -129,7 +135,7 @@ static char *semitrim(char *s)
 
 char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
 {
-  //flu_putf(fabr_tree_to_string(t, line, 1));
+  fabr_puts_tree(t, line, 1);
 
   fabr_tree *d = fabr_tree_lookup(t, "d");
   if (d)
@@ -161,6 +167,10 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
     }
 
     short con = *((char *)flu_list_getd(vars, "_comment_on", "f")) == 't';
+
+    printf("line >%s< n is '%c' ", line, n);
+    printf("match is >%s< ", fabr_tree_string(line, tt));
+    printf("fn->next: %p\n", fn->next);
 
     if (n == '/' && con == 0)
       tt = fabr_tree_lookup(tt, "n");
