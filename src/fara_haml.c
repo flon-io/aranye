@@ -265,7 +265,7 @@ static fara_node *push_to_parent(
 static void eval_and_push(
   fabr_tree *t, const char *ev, fara_node *n, flu_dict *callbacks, void *data)
 {
-  char *code = flu_strtrim(ev);
+  char *code = flu_strtrim(ev + 1); // + 1 to skip '='
 
   fara_haml_callback *cb =
     flu_list_get(
@@ -396,7 +396,7 @@ static void *default_header_callback(
   if (n->atts == NULL) n->atts = flu_list_malloc();
 
   fabr_tree *t = fabr_parse_all(s, _header);
-  //flu_putf(fabr_tree_to_string(t, s, 1));
+  //fabr_puts_tree(t, s, 1);
 
   flu_list *es = fabr_tree_list_named(t, "e");
   for (flu_node *en = es->first; en; en = en->next)
@@ -532,7 +532,7 @@ fara_node *fara_haml_parse(
   //fabr_tree_free(tt);
 
   fabr_tree *t = fabr_parse_all(s, _haml);
-  fabr_puts_tree(t, s, 1);
+  //fabr_puts_tree(t, s, 1);
 
   fara_node *r = fara_node_malloc(NULL, NULL); // document node
   r->data = (void *)-1; // ;-)

@@ -35,23 +35,6 @@
 #include "fara_svar.h"
 
 
-//  fabr_parser *con = fabr_n_string(">", "/*");
-//  fabr_parser *coff = fabr_n_string("<", "*/");
-//
-//  fabr_parser *literal =
-//    //fabr_n_rex("l", "[^\\$;\n\r/]+");
-//    fabr_n_rex("l", "(/[^/\\*\\$;\n\r]|[^\\$;\n\r/])+");
-//  fabr_parser *reference =
-//    fabr_n_rex("r", "\\$[a-zA-Z-0-9_-]+");
-//  fabr_parser *semi =
-//    fabr_n_rex("s", "[ \t]*;[ \t]*");
-//
-//  fabr_parser *text =
-//    fabr_seq(
-//      fabr_alt(reference, con, coff, literal, semi, NULL), fabr_q("+"),
-//      eol,
-//      NULL);
-
 static fabr_tree *_con(fabr_input *i) { return fabr_str(">", i, "/*"); }
 static fabr_tree *_coff(fabr_input *i) { return fabr_str("<", i, "*/"); }
 
@@ -214,8 +197,7 @@ char *fara_extrapolate(const char *line, flu_dict *vars)
   //flu_putf(fabr_tree_to_string(tt, line, 1));
 
   fabr_tree *t = fabr_parse_all(line, _def_or_text);
-
-  //flu_putf(fabr_tree_to_string(t, line, 1));
+  //fabr_puts_tree(t, line, 1);
 
   char *r = extrapolate(line, t, vars);
 
