@@ -100,11 +100,12 @@ static fabr_tree *_def_or_text(fabr_input *i)
   return fabr_alt(NULL, i, _definition, _text, NULL);
 }
 
-static short lsr_filter(const fabr_tree *t)
+
+static short lsrn_filter(const fabr_tree *t)
 {
   if (t->name == NULL) return 0;
   //if (*t->name == 'l' || *t->name == 's' || *t->name == 'r') return 1;
-  if (strchr("lsr></", *t->name)) return 1;
+  if (strchr("lsrn></", *t->name)) return 1;
   return 0;
 }
 
@@ -136,11 +137,11 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
 
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  flu_list *l = fabr_tree_list(t, lsr_filter);
+  flu_list *l = fabr_tree_list(t, lsrn_filter);
   for (flu_node *fn = l->first; fn; fn = fn->next)
   {
     fabr_tree *tt = fn->item;
-    //flu_putf(fabr_tree_to_string(tt, line, 1));
+    //printf("* "); flu_putf(fabr_tree_to_string(tt, line, 1));
 
     char n = *tt->name;
 
@@ -174,22 +175,6 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
   return flu_sbuffer_to_string(b);
 }
 
-static char *trim(char *line)
-{
-  if (line == NULL) return NULL;
-
-  for (size_t i = strlen(line); ; --i)
-  {
-    char c = i > 0 ? line[i - 1] : 'x';
-    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') continue;
-    line[i] = '\n'; line[i + 1] = 0; break;
-  }
-
-  if (strcmp(line, "\n") == 0) { free(line); return NULL; }
-
-  return line;
-}
-
 char *fara_extrapolate(const char *line, flu_dict *vars)
 {
   //printf("line >%s<\n", line);
@@ -203,7 +188,6 @@ char *fara_extrapolate(const char *line, flu_dict *vars)
 
   fabr_tree_free(t);
 
-  return trim(r);
-  //return r;
+  return r;
 }
 

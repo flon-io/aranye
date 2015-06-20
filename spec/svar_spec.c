@@ -68,7 +68,7 @@ context "svar:"
     {
       r = fara_extrapolate("  color: blue; // blah blah\n", vars);
 
-      expect(r ===f "  color: blue;\n");
+      expect(r ===f "  color: blue; \n");
     }
 
     it "removes // comment lines"
