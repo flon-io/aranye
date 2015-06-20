@@ -40,7 +40,8 @@ static fabr_tree *_coff(fabr_input *i) { return fabr_str("<", i, "*/"); }
 
 static fabr_tree *_semi(fabr_input *i)
 {
-  return fabr_rex("s", i, "[ \t]*;[ \t]*");
+  //return fabr_rex("s", i, "[ \t]*;[ \t]*");
+  return fabr_rex("s", i, "[ \t]*;");
 }
 
 static fabr_tree *_literal(fabr_input *i)
@@ -121,6 +122,15 @@ static char *semitrim(char *s)
   return s;
 }
 
+static int is_blank(const char *line, fabr_tree *t)
+{
+  for (size_t i = 0; i < t->length; i++)
+  {
+    if ( ! strchr(" \t", *(line + t->offset + i))) return 0;
+  }
+  return 1;
+}
+
 char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
 {
   //fabr_puts_tree(t, line, 1);
@@ -138,6 +148,8 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
   flu_sbuffer *b = flu_sbuffer_malloc();
 
   flu_list *l = fabr_tree_list(t, lsrn_filter);
+  int eolc = 0;
+
   for (flu_node *fn = l->first; fn; fn = fn->next)
   {
     fabr_tree *tt = fn->item;
@@ -161,12 +173,20 @@ char *extrapolate(const char *line, fabr_tree *t, flu_dict *vars)
     //printf("con is %i ", con);
     //printf("fn->next: %p\n", fn->next);
 
-    if (n == '/' && con == 0)
-      tt = fabr_tree_lookup(tt, "n");
-    else if (n == '<')
+    if (n == '/' && con == 0) eolc = 1;
+
+    if (eolc && n != 'n') continue;
+
+    if (n == '<')
       flu_list_set(vars, "_comment_on", strdup("f"));
     else if (n == '>')
       flu_list_set(vars, "_comment_on", strdup("t"));
+
+    if (n == 'l' && is_blank(line, tt))
+    {
+      fabr_tree *ntt = fn->next ? fn->next->item : NULL;
+      if (ntt && *ntt->name == '/') continue;
+    }
 
     flu_sbputs_n(b, line + tt->offset, tt->length);
   }
