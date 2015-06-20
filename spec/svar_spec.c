@@ -76,7 +76,7 @@ context "svar:"
     {
       r = fara_extrapolate(" // blah blah\n", vars);
 
-      expect(r == NULL);
+      expect(r ===f "\n");
     }
 
     it "doesn't touch /* comments"
