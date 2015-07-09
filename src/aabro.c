@@ -264,8 +264,9 @@ static void fabr_t_list(
 
 flu_list *fabr_tree_list(fabr_tree *t, fabr_tree_func *f)
 {
-  flu_list *l = flu_list_malloc();
+  if (t == NULL) return NULL;
 
+  flu_list *l = flu_list_malloc();
   fabr_t_list(l, t, f, 0);
 
   return l;
@@ -273,8 +274,9 @@ flu_list *fabr_tree_list(fabr_tree *t, fabr_tree_func *f)
 
 flu_list *fabr_tree_list_cn(fabr_tree *t, fabr_tree_func *f)
 {
-  flu_list *l = flu_list_malloc();
+  if (t == NULL) return NULL;
 
+  flu_list *l = flu_list_malloc();
   fabr_t_list(l, t, f, 1);
 
   return l;
@@ -298,8 +300,9 @@ static void fabr_t_list_named(
 
 flu_list *fabr_tree_list_named(fabr_tree *t, const char *name)
 {
-  flu_list *l = flu_list_malloc();
+  if (t == NULL) return NULL;
 
+  flu_list *l = flu_list_malloc();
   fabr_t_list_named(l, t, name, 0);
 
   return l;
@@ -307,8 +310,9 @@ flu_list *fabr_tree_list_named(fabr_tree *t, const char *name)
 
 flu_list *fabr_tree_list_named_cn(fabr_tree *t, const char *name)
 {
-  flu_list *l = flu_list_malloc();
+  if (t == NULL) return NULL;
 
+  flu_list *l = flu_list_malloc();
   fabr_t_list_named(l, t, name, 1);
 
   return l;
@@ -1212,8 +1216,8 @@ int fabr_match(const char *input, fabr_parser *p)
   return r;
 }
 
-//commit bbf7f212bdce4c6a1503fd993313335570d1abcc
+//commit 8549c8a26cf41bc6393cbf2ec064bf3ba11e2085
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Wed Jul 8 06:15:01 2015 +0900
+//Date:   Thu Jul 9 08:00:28 2015 +0900
 //
-//    make _alt and _altg "fronts" to _altgr
+//    comment out spec debug output

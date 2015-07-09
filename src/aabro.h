@@ -236,8 +236,8 @@ int fabr_match(const char *input, fabr_parser *p);
 
 #endif // FLON_AABRO_H
 
-//commit bbf7f212bdce4c6a1503fd993313335570d1abcc
+//commit 8549c8a26cf41bc6393cbf2ec064bf3ba11e2085
 //Author: John Mettraux <jmettraux@gmail.com>
-//Date:   Wed Jul 8 06:15:01 2015 +0900
+//Date:   Thu Jul 9 08:00:28 2015 +0900
 //
-//    make _alt and _altg "fronts" to _altgr
+//    comment out spec debug output
